@@ -37,22 +37,22 @@ export default async function Footer() {
                         </p>
                         <div className="flex gap-4">
                             {profile?.facebook && (
-                                <Link href={profile.facebook} target="_blank" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
+                                <Link href={profile.facebook} target="_blank" aria-label="Kunjungi Facebook Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
                                     <Facebook className="w-5 h-5" />
                                 </Link>
                             )}
                             {profile?.twitter && (
-                                <Link href={profile.twitter} target="_blank" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
+                                <Link href={profile.twitter} target="_blank" aria-label="Kunjungi Twitter Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
                                     <Twitter className="w-5 h-5" />
                                 </Link>
                             )}
                             {profile?.instagram && (
-                                <Link href={profile.instagram} target="_blank" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
+                                <Link href={profile.instagram} target="_blank" aria-label="Kunjungi Instagram Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
                                     <Instagram className="w-5 h-5" />
                                 </Link>
                             )}
                             {profile?.youtube && (
-                                <Link href={profile.youtube} target="_blank" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
+                                <Link href={profile.youtube} target="_blank" aria-label="Kunjungi YouTube Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
                                     <Youtube className="w-5 h-5" />
                                 </Link>
                             )}
@@ -108,7 +108,7 @@ export default async function Footer() {
                         </p>
                         <div className="flex gap-2">
                             <input type="email" placeholder="Email Anda" className="bg-white/10 border-none rounded-lg px-4 py-2 text-white placeholder:text-white/30 w-full focus:ring-1 focus:ring-secondary outline-none" />
-                            <button className="bg-secondary text-primary font-bold px-4 py-2 rounded-lg hover:bg-white transition-colors">
+                            <button aria-label="Subscribe Newsletter" className="bg-secondary text-primary font-bold px-4 py-2 rounded-lg hover:bg-white transition-colors">
                                 OK
                             </button>
                         </div>

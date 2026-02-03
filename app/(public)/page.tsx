@@ -124,7 +124,7 @@ export default async function Home() {
                                 </Button>
                             </Link>
                             <Link href="/news">
-                                <Button variant="outline" size="lg" className="h-14 px-8 rounded-none border-white/30 text-white hover:bg-white/10 hover:border-white transition-all font-medium">
+                                <Button variant="outline" size="lg" className="h-14 px-8 rounded-none border-white/50 text-white hover:bg-white/10 hover:border-white transition-all font-medium">
                                     Baca Warta
                                 </Button>
                             </Link>
@@ -142,7 +142,7 @@ export default async function Home() {
                                     <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary">
                                         <HandHeart className="w-8 h-8" />
                                     </div>
-                                    <h3 className="text-xl font-bold mb-2">Khidmat Untuk Umat</h3>
+                                    <h2 className="text-xl font-bold mb-2">Khidmat Untuk Umat</h2>
                                     <p className="opacity-80 text-sm">Dedikasi tanpa batas untuk kemaslahatan masyarakat Indonesia di tingkat akar rumput.</p>
                                 </div>
                             </div>
@@ -161,7 +161,7 @@ export default async function Home() {
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row gap-16 items-start">
                         <div className="md:w-1/3 sticky top-24">
-                            <h2 className="text-sm font-bold tracking-widest text-primary/60 uppercase mb-4">Filosofi Kami</h2>
+                            <h2 className="text-sm font-bold tracking-widest text-primary/80 uppercase mb-4">Filosofi Kami</h2>
                             <h3 className="text-4xl md:text-5xl font-serif font-medium text-primary leading-tight mb-6">
                                 Dari Kampung, <br />Untuk Indonesia.
                             </h3>
@@ -287,9 +287,9 @@ export default async function Home() {
                                             <span className="w-1 h-1 bg-secondary rounded-full"></span>
                                             <span>Berita</span>
                                         </div>
-                                        <h4 className="text-xl font-serif font-semibold text-primary leading-tight group-hover:text-secondary transition-colors mb-2">
+                                        <h3 className="text-xl font-serif font-semibold text-primary leading-tight group-hover:text-secondary transition-colors mb-2">
                                             {news.title}
-                                        </h4>
+                                        </h3>
                                         <p className="text-muted-foreground text-sm line-clamp-2">
                                             {news.content.substring(0, 100)}...
                                         </p>
@@ -323,7 +323,7 @@ export default async function Home() {
                                 )}
                                 <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                     <div className="text-center p-6 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                        <h4 className="text-white font-serif text-xl font-bold mb-2">{item.title}</h4>
+                                        <h3 className="text-white font-serif text-xl font-bold mb-2">{item.title}</h3>
                                         <p className="text-white/60 text-xs uppercase tracking-wider">
                                             {item.type === 'album' ? 'Album Foto' : 'Foto Lepas'}
                                         </p>
@@ -349,7 +349,7 @@ export default async function Home() {
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                         <div>
-                            <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-2 block">Jadwal Kami</span>
+                            <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2 block">Jadwal Kami</span>
                             <h2 className="text-4xl font-serif font-bold text-primary">Agenda Mendatang</h2>
                         </div>
                         <Button variant="outline" className="mt-4 md:mt-0">Lihat Semua Agenda</Button>
@@ -367,7 +367,7 @@ export default async function Home() {
                                             <span className="text-xs tracking-widest uppercase font-medium">{monthNames[agendaDate.getMonth()]}</span>
                                         </div>
                                         <div>
-                                            <h4 className="text-lg font-bold font-serif text-primary mb-2 line-clamp-2 leading-tight group-hover:text-secondary transition-colors">{item.title}</h4>
+                                            <h3 className="text-lg font-bold font-serif text-primary mb-2 line-clamp-2 leading-tight group-hover:text-secondary transition-colors">{item.title}</h3>
                                             <div className="flex items-center text-muted-foreground text-sm">
                                                 <MapPin className="w-3 h-3 mr-2" />
                                                 {item.location}
@@ -418,7 +418,7 @@ export default async function Home() {
                             Mendaftar Anggota
                         </Button>
                         <Link href="/about" className="w-full">
-                            <Button size="lg" variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
+                            <Button size="lg" variant="outline" className="w-full border-white/50 text-white hover:bg-white/10">
                                 Hubungi Sekretariat
                             </Button>
                         </Link>

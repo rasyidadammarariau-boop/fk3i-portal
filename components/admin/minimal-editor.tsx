@@ -16,16 +16,13 @@ import {
     Heading3,
     Link as LinkIcon,
     Image as ImageIcon,
-    Undo,
-    Redo
 } from "lucide-react"
 import { useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 
-const Toolbar = ({ editor }: { editor: any }) => {
-    if (!editor) return null
-
+const Toolbar = ({ editor }: { editor: import('@tiptap/react').Editor | null }) => {
     const addLink = useCallback(() => {
+        if (!editor) return
         const previousUrl = editor.getAttributes('link').href
         const url = window.prompt('URL', previousUrl)
 
@@ -39,11 +36,14 @@ const Toolbar = ({ editor }: { editor: any }) => {
     }, [editor])
 
     const addImage = useCallback(() => {
+        if (!editor) return
         const url = window.prompt('URL Gambar')
         if (url) {
             editor.chain().focus().setImage({ src: url }).run()
         }
     }, [editor])
+
+    if (!editor) return null
 
     return (
         <div className="border-b bg-gray-50/50 dark:bg-gray-800/50 p-2 flex flex-wrap gap-1 sticky top-0 z-10 backdrop-blur-sm">
@@ -129,7 +129,7 @@ export function MinimalEditor({ value, onChange, placeholder = "Tulis sesuatu...
             LinkExtension.configure({
                 openOnClick: false,
                 HTMLAttributes: {
-                    class: 'text-blue-500 hover:underline cursor-pointer',
+                    class: 'foreground hover:underline cursor-pointer',
                 },
             }),
             ImageExtension.configure({
@@ -159,3 +159,4 @@ export function MinimalEditor({ value, onChange, placeholder = "Tulis sesuatu...
         </div>
     )
 }
+

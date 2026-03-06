@@ -1,12 +1,12 @@
 "use client"
 
-import { AdminSidebar } from "@/components/admin/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 import { AdminHeader } from "@/components/admin/header"
 import { SessionProvider, useSession } from "next-auth/react"
-import { ThemeProvider } from "@/components/theme-provider"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { AdminLayoutSkeleton } from "@/components/admin/layout-skeleton"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession()
@@ -27,17 +27,15 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 font-sans">
-            {/* Sidebar wrapper if needed, assume Sidebar is self-contained */}
-            <AdminSidebar />
-
-            <div className="flex-1 flex flex-col overflow-hidden">
+        <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset className="flex flex-col h-screen overflow-hidden">
                 <AdminHeader />
-                <main className="flex-1 overflow-y-auto p-6 scroll-smooth">
+                <main className="flex-1 overflow-y-auto p-6 scroll-smooth bg-muted/20">
                     {children}
                 </main>
-            </div>
-        </div>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 
@@ -48,9 +46,8 @@ export default function AdminLayout({
 }>) {
     return (
         <SessionProvider>
-            <ThemeProvider>
-                <AdminLayoutContent>{children}</AdminLayoutContent>
-            </ThemeProvider>
+            <AdminLayoutContent>{children}</AdminLayoutContent>
         </SessionProvider>
     );
 }
+

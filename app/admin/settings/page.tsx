@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
 import { redirect } from "next/navigation"
 import SettingsClient from "./settings-client"
-import { getUserSettings } from "./actions"
 
 export default async function SettingsPage() {
     const session = await auth()
@@ -11,7 +10,6 @@ export default async function SettingsPage() {
         redirect("/login")
     }
 
-    // Fetch full user data including phone and bio
     const user = await prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
@@ -27,8 +25,6 @@ export default async function SettingsPage() {
         redirect("/login")
     }
 
-    // Fetch user settings
-    const settings = await getUserSettings(session.user.id)
-
-    return <SettingsClient user={user} settings={settings} />
+    return <SettingsClient user={user} />
 }
+

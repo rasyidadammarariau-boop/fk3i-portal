@@ -11,20 +11,13 @@ const bulkDeleteSchema = z.object({
 
 export async function deleteNewsBulk(ids: string[]) {
     try {
-        // Validate input
         const validated = bulkDeleteSchema.parse({ ids })
-
-        await prisma.news.deleteMany({
-            where: {
-                id: {
-                    in: validated.ids
-                }
-            }
-        })
+        await prisma.news.deleteMany({ where: { id: { in: validated.ids } } })
         revalidatePath('/admin/news')
+        revalidatePath('/news')
+        revalidatePath('/')
         return { success: true }
     } catch (error) {
-        console.error("Delete news bulk error:", error)
         if (error instanceof z.ZodError) {
             return { success: false, error: error.issues[0].message }
         }
@@ -35,18 +28,10 @@ export async function deleteNewsBulk(ids: string[]) {
 export async function deleteGalleryBulk(ids: string[]) {
     try {
         const validated = bulkDeleteSchema.parse({ ids })
-
-        await prisma.galleryAlbum.deleteMany({
-            where: {
-                id: {
-                    in: validated.ids
-                }
-            }
-        })
+        await prisma.galleryAlbum.deleteMany({ where: { id: { in: validated.ids } } })
         revalidatePath('/admin/gallery')
         return { success: true }
     } catch (error) {
-        console.error("Delete gallery bulk error:", error)
         if (error instanceof z.ZodError) {
             return { success: false, error: error.issues[0].message }
         }
@@ -54,24 +39,18 @@ export async function deleteGalleryBulk(ids: string[]) {
     }
 }
 
-export async function deleteAgendaBulk(ids: string[]) {
+export async function toggleFeatured(id: string, currentFeatured: boolean) {
     try {
-        const validated = bulkDeleteSchema.parse({ ids })
-
-        await prisma.agenda.deleteMany({
-            where: {
-                id: {
-                    in: validated.ids
-                }
-            }
-        })
-        revalidatePath('/admin/agenda')
-        return { success: true }
-    } catch (error) {
-        console.error("Delete agenda bulk error:", error)
-        if (error instanceof z.ZodError) {
-            return { success: false, error: error.issues[0].message }
+        if (!currentFeatured) {
+            // Unset semua dulu — hanya boleh 1 featured
+            await prisma.news.updateMany({ where: { featured: true }, data: { featured: false } })
         }
-        return { success: false, error: 'Gagal menghapus agenda' }
+        await prisma.news.update({ where: { id }, data: { featured: !currentFeatured } })
+        revalidatePath('/admin/news')
+        revalidatePath('/news')
+        revalidatePath('/')
+        return { success: true }
+    } catch {
+        return { success: false, error: 'Gagal mengubah status unggulan' }
     }
 }

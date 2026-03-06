@@ -1,7 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, Image as ImageIcon, MoreVertical, Pencil, Trash, Folder, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
@@ -27,7 +26,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }) {
+export function GalleryGrid({ albums, images }: { albums: Array<{ id: string, title: string, eventDate: Date | string, cover: string | null, _count?: { images: number } }>; images: Array<{ id: string, url: string, title: string | null, createdAt: Date | string, published: boolean }> }) {
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [deletingImageId, setDeletingImageId] = useState<string | null>(null)
     const [selectedAlbumIds, setSelectedAlbumIds] = useState<string[]>([])
@@ -47,7 +46,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         try {
             await deleteGalleryAlbum(deletingId)
             toast.success("Album berhasil dihapus")
-        } catch (error) {
+        } catch {
             toast.error("Gagal menghapus album")
         } finally {
             setDeletingId(null)
@@ -59,7 +58,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         try {
             await deleteGalleryImage(deletingImageId)
             toast.success("Foto berhasil dihapus")
-        } catch (error) {
+        } catch {
             toast.error("Gagal menghapus foto")
         } finally {
             setDeletingImageId(null)
@@ -73,8 +72,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
             setSelectedAlbumIds([])
             setShowBulkDeleteAlert(false)
             router.refresh()
-        } catch (error) {
-            console.error(error)
+        } catch {
             toast.error("Gagal menghapus album terpilih")
         }
     }
@@ -87,7 +85,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         )
     }
 
-    const toggleSelectAllAlbums = () => {
+    const _toggleSelectAllAlbums = () => {
         if (selectedAlbumIds.length === albums.length) {
             setSelectedAlbumIds([])
         } else {
@@ -99,8 +97,8 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         return (
             <div className="text-center py-20 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-dashed">
                 <ImageIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Galeri Kosong</h3>
-                <p className="text-muted-foreground mt-1">Belum ada album maupun foto yang diupload.</p>
+                <h3 className="text-lg font-medium  dark:text-gray-100">Galeri Kosong</h3>
+                <p className=" mt-1">Belum ada album maupun foto yang diupload.</p>
             </div>
         )
     }
@@ -109,7 +107,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         <>
             {/* Bulk Action Bar */}
             {selectedAlbumIds.length > 0 && (
-                <div className="sticky top-4 z-50 bg-white dark:bg-gray-800 p-4 rounded-xl border shadow-lg flex items-center justify-between mb-6 animate-in slide-in-from-top-2">
+                <div className="sticky top-4 z-50  p-4 rounded-xl border shadow-lg flex items-center justify-between mb-6 animate-in slide-in-from-top-2">
                     <div className="flex items-center gap-4">
                         <span className="font-medium">{selectedAlbumIds.length} Album Dipilih</span>
                         <Button variant="ghost" size="sm" onClick={() => setSelectedAlbumIds([])}>
@@ -130,7 +128,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
                     return (
                         <Card
                             key={`album-${album.id}`}
-                            className={`group overflow-hidden border-0 shadow-sm hover:shadow-md transition-all bg-white dark:bg-gray-800 relative ${isSelected ? 'ring-2 ring-primary' : ''}`}
+                            className={`group overflow-hidden border-0 shadow-sm hover:shadow-md transition-all  relative ${isSelected ? 'ring-2 ring-primary' : ''}`}
                         >
                             {/* Selection Checkbox Overlay */}
                             <div className="absolute top-2 left-2 z-30">
@@ -145,10 +143,10 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
                                 </div>
                             </div>
 
-                            <div className="aspect-[4/3] relative bg-blue-50 dark:bg-blue-900/20 overflow-hidden">
+                            <div className="aspect-[4/3] relative bg-muted/50 overflow-hidden">
                                 {/* Folder Decoration */}
-                                <div className="absolute top-0 right-0 p-2 bg-blue-600/10 rounded-bl-lg z-10">
-                                    <Folder className="w-4 h-4 text-blue-600" />
+                                <div className="absolute top-0 right-0 p-2 bg-primary/10 rounded-bl-lg z-10">
+                                    <Folder className="w-4 h-4 text-primary" />
                                 </div>
 
                                 {album.cover ? (
@@ -159,9 +157,9 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-blue-300 bg-blue-50/50 dark:bg-blue-900/10">
+                                    <div className="w-full h-full flex flex-col items-center justify-center  bg-muted/50 dark:bg-muted">
                                         <Folder className="w-12 h-12 mb-2 opacity-50" />
-                                        <span className="text-xs font-medium text-blue-500">Album</span>
+                                        <span className="text-xs font-medium ">Album</span>
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -191,15 +189,15 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
                             </div>
 
                             <CardContent className="p-4">
-                                <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                                <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-1 group-hover:text-primary transition-colors">
                                     <Link href={`/admin/gallery/${album.id}`}>{album.title}</Link>
                                 </h3>
-                                <div className="flex items-center text-xs text-muted-foreground gap-3">
+                                <div className="flex items-center text-xs  gap-3">
                                     <span className="flex items-center gap-1">
                                         <Calendar className="w-3 h-3" />
                                         {new Date(album.eventDate).toLocaleDateString()}
                                     </span>
-                                    <span className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-1.5 py-0.5 rounded-full">
+                                    <span className="flex items-center gap-1 bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded-full">
                                         {album._count?.images || 0} Foto
                                     </span>
                                 </div>
@@ -210,8 +208,8 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
 
                 {/* --- STANDALONE IMAGES --- */}
                 {images.map((img) => (
-                    <Card key={`img-${img.id}`} className="group overflow-hidden border shadow-sm hover:shadow-md transition-all bg-white dark:bg-gray-800">
-                        <div className="aspect-[4/3] relative bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <Card key={`img-${img.id}`} className="group overflow-hidden border shadow-sm hover:shadow-md transition-all ">
+                        <div className="aspect-[4/3] relative  overflow-hidden">
                             <Image
                                 src={img.url}
                                 alt={img.title || "Foto"}
@@ -240,7 +238,7 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
                         </div>
                         <CardContent className="p-3">
                             <p className="text-sm font-medium line-clamp-1 truncate">{img.title || "Tanpa Judul"}</p>
-                            <p className="text-xs text-muted-foreground">{new Date(img.createdAt).toLocaleDateString()}</p>
+                            <p className="text-xs ">{new Date(img.createdAt).toLocaleDateString()}</p>
                         </CardContent>
                     </Card>
                 ))}
@@ -302,3 +300,4 @@ export function GalleryGrid({ albums, images }: { albums: any[]; images: any[] }
         </>
     )
 }
+

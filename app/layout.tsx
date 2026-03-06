@@ -1,33 +1,40 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+﻿import type { Metadata } from "next";
+import { Inter, Lora } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
-const playfair = Playfair_Display({
+// Inter: standar emas font layar — sangat nyaman di mata, dipakai Vercel, Notion, Linear
+const inter = Inter({
     subsets: ["latin"],
-    variable: "--font-playfair",
+    variable: "--font-inter",
+    display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+// Lora: serif yang lembut & hangat untuk heading — lebih readable dari Playfair di layar
+const lora = Lora({
     subsets: ["latin"],
-    variable: "--font-jakarta",
+    variable: "--font-lora",
+    weight: ["400", "500", "600", "700"],
+    style: ["normal", "italic"],
+    display: "swap",
 });
 
 export const metadata: Metadata = {
     title: {
-        template: '%s | FK3i - Forum Komunikasi Kyai Kampung Indonesia',
-        default: 'FK3i - Forum Komunikasi Kyai Kampung Indonesia',
+        template: '%s | BEM Pesantren Indonesia',
+        default: 'BEM Pesantren Indonesia',
     },
-    description: "Wadah silaturahmi dan pergerakan kyai kampung dalam menjaga nilai-nilai keislaman, kebangsaan, dan pemberdayaan umat berbasis kearifan lokal.",
-    keywords: ["FK3i", "Kyai Kampung", "Ulama", "Islam Nusantara", "Pesantren", "Dakwah"],
-    authors: [{ name: "FK3i Pusat" }],
-    creator: "FK3i",
-    publisher: "FK3i",
+    description: "Organisasi mahasiswa santri Indonesia yang bergerak dalam penguatan keagamaan, keilmuan, dan pemberdayaan mahasiswa pesantren di seluruh Indonesia.",
+    keywords: ["BEM Pesantren Indonesia", "Mahasiswa Santri", "Pesantren", "Islam", "Pendidikan Pesantren", "BEM Pesantren"],
+    authors: [{ name: "BEM Pesantren Indonesia" }],
+    creator: "BEM Pesantren Indonesia",
+    publisher: "BEM Pesantren Indonesia",
     openGraph: {
-        title: "FK3i - Forum Komunikasi Kyai Kampung Indonesia",
-        description: "Wadah silaturahmi dan pergerakan kyai kampung dalam menjaga nilai-nilai keislaman dan kebangsaan.",
-        url: "https://fk3i.or.id",
-        siteName: "FK3i",
+        title: "BEM Pesantren Indonesia",
+        description: "Organisasi mahasiswa santri Indonesia yang bergerak dalam penguatan keagamaan, keilmuan, dan pemberdayaan mahasiswa pesantren di seluruh Indonesia.",
+        url: "https://bem-pesantren.or.id",
+        siteName: "BEM Pesantren Indonesia",
         images: [
             {
                 url: "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=2070&auto=format&fit=crop",
@@ -40,8 +47,8 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "FK3i - Kyai Kampung Membangun Peradaban",
-        description: "Forum Komunikasi Kyai Kampung Indonesia",
+        title: "BEM Pesantren Indonesia",
+        description: "Organisasi mahasiswa santri Indonesia - BEM Pesantren Indonesia",
         images: ["https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=2070&auto=format&fit=crop"],
     },
 };
@@ -54,28 +61,17 @@ export default function RootLayout({
     return (
         <html lang="id" suppressHydrationWarning>
             <body
-                className={`${playfair.variable} ${plusJakarta.variable} font-sans antialiased flex flex-col min-h-screen selection:bg-primary/20`}
+                className={`${lora.variable} ${inter.variable} font-sans antialiased flex flex-col min-h-screen selection:bg-primary/20`}
             >
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            (function() {
-                                try {
-                                    var localTheme = localStorage.getItem('theme-preference');
-                                    var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                                    
-                                    if (localTheme === 'dark' || (!localTheme && systemTheme)) {
-                                        document.documentElement.classList.add('dark');
-                                    } else {
-                                        document.documentElement.classList.remove('dark');
-                                    }
-                                } catch (e) {}
-                            })();
-                        `,
-                    }}
-                />
-                {children}
-                <Toaster />
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    {children}
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );

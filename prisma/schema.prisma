@@ -2,39 +2,47 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
-  provider  = "postgresql"
- 
+  provider = "postgresql"
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  phone     String?
-  bio       String?
-  role      String   @default("admin")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  password           String
+  name               String?
+  role               String    @default("admin")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  bio                String?
+  phone              String?
+  resetToken         String?   // token untuk reset password
+  resetTokenExpiry   DateTime? // waktu kedaluwarsa token
 }
 
 model News {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  content   String
-  image     String?
-  categoryId String?
-  category  Category? @relation(fields: [categoryId], references: [id])
-  excerpt   String?
-  author    String?
-  tags      String?
-  views     Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  content         String
+  image           String?
+  published       Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  author          String?
+  excerpt         String?
+  tags            String?   // Backward compatibility
+  views           Int       @default(0)
+  categoryId      String?
+  featured        Boolean   @default(false)
+  attachmentUrl   String?   // Lampiran dokumen PDF BEM
+  attachmentName  String?   // Nama file lampiran
+  metaDescription String?
+  metaTitle       String?
+  publishedAt     DateTime?
+  readTime        Int?
+  category        Category? @relation(fields: [categoryId], references: [id])
+  tagRelations    NewsTag[]
 }
 
 model Category {
@@ -46,17 +54,36 @@ model Category {
   news      News[]
 }
 
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  news      NewsTag[]
+}
+
+model NewsTag {
+  newsId String
+  tagId  String
+  news   News   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, tagId])
+}
+
 model GalleryAlbum {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  description String?
-  cover       String?
-  eventDate   DateTime @default(now())
-  images      GalleryImage[]
-  published   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String         @id @default(cuid())
+  title        String
+  slug         String         @unique
+  description  String?
+  cover        String?
+  eventDate    DateTime       @default(now())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  published    Boolean        @default(true)
+  activityType String         @default("kegiatan")  // aksi, audiensi, silatnas, kajian, kegiatan
+  location     String?        // Kota/Instansi tempat kegiatan berlangsung
+  images       GalleryImage[]
 }
 
 model GalleryImage {
@@ -65,20 +92,21 @@ model GalleryImage {
   title       String?
   description String?
   albumId     String?
-  album       GalleryAlbum? @relation(fields: [albumId], references: [id], onDelete: Cascade)
-  published   Boolean       @default(true)
   createdAt   DateTime      @default(now())
+  published   Boolean       @default(true)
+  album       GalleryAlbum? @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
-model Agenda {
+model OrgDocument {
   id          String   @id @default(cuid())
   title       String
-  slug        String   @unique
-  description String
-  date        DateTime
-  location    String
-  image       String?
+  description String?
+  fileUrl     String   // path ke file PDF/DOC yang diupload
+  fileName    String   // nama file asli
+  category    String   @default("umum")  // ad-art, gbho, sk, sop, umum
   published   Boolean  @default(true)
+  downloadCount Int    @default(0)
+  uploadedBy  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -87,90 +115,65 @@ model Info {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String
-  type      String   @default("text") // text, richtext, image
+  type      String   @default("text")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model UserSettings {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  
-  // Notification preferences
-  emailNotifications    Boolean @default(true)
-  newsNotifications     Boolean @default(true)
-  agendaNotifications   Boolean @default(true)
-  commentNotifications  Boolean @default(false)
-  weeklyNewsletter      Boolean @default(true)
-  
-  // UI preferences
-  darkMode      Boolean @default(false)
-  compactMode   Boolean @default(false)
-  animations    Boolean @default(true)
-  language      String  @default("id")
-  itemsPerPage  Int     @default(10)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+
 
 model ContactMessage {
-  id          String   @id @default(cuid())
-  name        String
-  email       String
-  phone       String?
-  categoryId  String?
-  category    MessageCategory? @relation(fields: [categoryId], references: [id])
-  subject     String
-  message     String
-  status      String   @default("new") // new, read, replied, archived
-  adminNotes  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String           @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  categoryId String?
+  subject    String
+  message    String
+  status     String           @default("new")
+  adminNotes String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  category   MessageCategory? @relation(fields: [categoryId], references: [id])
 }
 
 model MessageCategory {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String           @unique
   description String?
   icon        String?
-  published   Boolean  @default(true)
-  order       Int      @default(0)
+  published   Boolean          @default(true)
+  order       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   messages    ContactMessage[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model OrganizationProfile {
-  id              String   @id @default(cuid())
-  // Contact Info
-  email           String?
-  emailSecondary  String?
-  phone           String?
-  phoneSecondary  String?
-  whatsapp        String?
+  id                String   @id @default(cuid())
+  name              String?  // Nama resmi organisasi
+  tagline           String?  // Slogan / tagline
+  logoUrl           String?  // URL logo organisasi
+  email             String?
+  emailSecondary    String?
+  phone             String?
+  phoneSecondary    String?
+  whatsapp          String?
   whatsappSecondary String?
-  
-  // Address
-  address         String?
-  city            String?
-  province        String?
-  postalCode      String?
-  
-  // Social Media
-  facebook        String?
-  instagram       String?
-  twitter         String?
-  youtube         String?
-  
-  // About
-  shortDescription String?
-  longDescription  String?
-  vision           String?
-  mission          String?
-  history          String?
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  address           String?
+  city              String?
+  province          String?
+  postalCode        String?
+  facebook          String?
+  instagram         String?
+  twitter           String?
+  youtube           String?
+  shortDescription  String?
+  longDescription   String?
+  vision            String?
+  mission           String?
+  history           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

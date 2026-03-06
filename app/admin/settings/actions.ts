@@ -119,79 +119,7 @@ export async function changePassword(formData: FormData) {
     }
 }
 
-export async function updateNotificationSettings(settings: {
-    emailNotifications: boolean
-    newsNotifications: boolean
-    agendaNotifications: boolean
-    commentNotifications: boolean
-    weeklyNewsletter: boolean
-}) {
-    try {
-        const session = await auth()
-        if (!session?.user?.id) {
-            return { success: false, error: 'Unauthorized' }
-        }
 
-        // Upsert user settings
-        await prisma.userSettings.upsert({
-            where: { userId: session.user.id },
-            create: {
-                userId: session.user.id,
-                ...settings
-            },
-            update: settings
-        })
-
-        revalidatePath('/admin/settings')
-        return { success: true, message: 'Pengaturan notifikasi berhasil disimpan' }
-    } catch (error) {
-        console.error("Update notification settings error:", error)
-        return { success: false, error: 'Gagal menyimpan pengaturan notifikasi' }
-    }
-}
-
-export async function updatePreferences(preferences: {
-    darkMode: boolean
-    compactMode: boolean
-    animations: boolean
-    language: string
-    itemsPerPage: number
-}) {
-    try {
-        const session = await auth()
-        if (!session?.user?.id) {
-            return { success: false, error: 'Unauthorized' }
-        }
-
-        // Upsert user settings
-        await prisma.userSettings.upsert({
-            where: { userId: session.user.id },
-            create: {
-                userId: session.user.id,
-                ...preferences
-            },
-            update: preferences
-        })
-
-        revalidatePath('/admin/settings')
-        return { success: true, message: 'Preferensi berhasil disimpan' }
-    } catch (error) {
-        return { success: false, error: 'Gagal menyimpan preferensi' }
-    }
-}
-
-export async function getUserSettings(userId: string) {
-    try {
-        const settings = await prisma.userSettings.findUnique({
-            where: { userId }
-        })
-
-        return settings
-    } catch (error) {
-        console.error("Get user settings error:", error)
-        return null
-    }
-}
 
 export async function deleteAccount() {
     try {
@@ -199,11 +127,6 @@ export async function deleteAccount() {
         if (!session?.user?.id) {
             return { success: false, error: 'Unauthorized' }
         }
-
-        // Delete user settings first (if exists)
-        await prisma.userSettings.deleteMany({
-            where: { userId: session.user.id }
-        })
 
         // Delete user account
         await prisma.user.delete({
@@ -216,3 +139,4 @@ export async function deleteAccount() {
         return { success: false, error: 'Gagal menghapus akun' }
     }
 }
+

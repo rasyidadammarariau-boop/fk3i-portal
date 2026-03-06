@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Label, Pie, PieChart, Sector } from "recharts"
-import { type PieSectorDataItem } from "recharts/types/polar/Pie"
+import { Label, Pie, PieChart } from "recharts"
 
 import {
     Card,
@@ -18,13 +17,6 @@ import {
     ChartTooltipContent,
     type ChartConfig,
 } from "@/components/ui/chart"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 
 export const description = "An interactive pie chart"
 
@@ -48,7 +40,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function ChartPieInteractive({ data }: { data: any[] }) {
+export function ChartPieInteractive({ data }: { data: Array<{ category: string, count: number }> }) {
     const id = "pie-interactive"
 
     // Calculate total
@@ -57,12 +49,12 @@ export function ChartPieInteractive({ data }: { data: any[] }) {
     }, [data])
 
     return (
-        <Card data-chart={id} className="flex flex-col dark:border-gray-700 dark:bg-gray-800">
+        <Card data-chart={id} className="flex flex-col">
             <ChartStyle id={id} config={chartConfig} />
             <CardHeader className="flex-row items-start space-y-0 pb-0">
                 <div className="grid gap-1">
-                    <CardTitle className="dark:text-white">Distribusi Konten</CardTitle>
-                    <CardDescription className="dark:text-gray-400">Total {total} items</CardDescription>
+                    <CardTitle>Distribusi Konten</CardTitle>
+                    <CardDescription>Total {total} items</CardDescription>
                 </div>
             </CardHeader>
             <CardContent className="flex flex-1 justify-center pb-0">
@@ -96,14 +88,14 @@ export function ChartPieInteractive({ data }: { data: any[] }) {
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
-                                                    className="fill-foreground text-3xl font-bold dark:fill-white"
+                                                    className="fill-foreground text-3xl font-bold"
                                                 >
                                                     {total.toLocaleString()}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
-                                                    className="fill-muted-foreground dark:fill-gray-400"
+                                                    className="fill-muted-foreground"
                                                 >
                                                     Items
                                                 </tspan>
@@ -119,3 +111,4 @@ export function ChartPieInteractive({ data }: { data: any[] }) {
         </Card>
     )
 }
+

@@ -2,21 +2,21 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
     return (
-        <div className="bg-[#fcfcfc] min-h-screen pb-24">
+        <div className="bg-background min-h-screen">
             {/* Header Skeleton */}
-            <div className="bg-primary/5 pt-32 pb-16 text-center">
-                <div className="container mx-auto px-6 flex flex-col items-center gap-4">
+            <section className="pt-24 pb-16 md:pt-32 md:pb-24 relative overflow-hidden text-center">
+                <div className="container mx-auto px-6 flex flex-col items-center gap-4 relative z-10">
                     <Skeleton className="h-4 w-32 rounded-full" />
                     <Skeleton className="h-12 w-64 md:w-96" />
                     <Skeleton className="h-6 w-48 md:w-80" />
                 </div>
-            </div>
+            </section>
 
-            <div className="container mx-auto px-6 -mt-10 relative z-20 mb-16">
+            <section className="container mx-auto px-6 -mt-10 relative z-20 mb-16">
                 <Skeleton className="h-16 w-full max-w-3xl mx-auto rounded-xl" />
-            </div>
+            </section>
 
-            <div className="container mx-auto px-6 mt-16">
+            <section className="container mx-auto px-6 mt-12 md:mt-16 pb-16 md:pb-24">
                 {/* Featured Skeleton */}
                 <div className="mb-16">
                     <Skeleton className="h-[400px] w-full rounded-2xl" />
@@ -33,7 +33,8 @@ export default function Loading() {
                         </div>
                     ))}
                 </div>
-            </div>
+            </section>
         </div>
     )
 }
+

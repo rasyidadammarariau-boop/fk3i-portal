@@ -9,9 +9,15 @@ import Link from "next/link"
 import { useActionState, useState } from "react"
 import { toast } from "sonner"
 import { useEffect } from "react"
+import { ImageUpload } from "@/components/admin/image-upload"
+
+interface ActionState {
+    error?: string
+    success?: boolean
+}
 
 interface AgendaFormProps {
-    action: (prevState: any, formData: FormData) => Promise<any>
+    action: (prevState: unknown, formData: FormData) => Promise<unknown>
     initialData?: {
         title: string
         description: string
@@ -30,13 +36,14 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
     const [description, setDescription] = useState(initialData?.description || "")
     const [date, setDate] = useState(initialData?.date ? new Date(initialData.date).toISOString().slice(0, 16) : "")
     const [location, setLocation] = useState(initialData?.location || "")
-    const [imagePreview, setImagePreview] = useState(initialData?.image || "")
+    const [imagePreview] = useState(initialData?.image || "")
 
     const isEdit = !!initialData
 
     useEffect(() => {
-        if (state?.error) {
-            toast.error(state.error)
+        const s = state as ActionState | null
+        if (s?.error) {
+            toast.error(s.error)
         }
     }, [state])
 
@@ -46,7 +53,7 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
 
                 {/* LEFT: FORM INPUTS */}
                 <div className="space-y-6">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border shadow-sm space-y-6">
+                    <div className=" p-6 rounded-xl border shadow-sm space-y-6">
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="title">Nama Kegiatan</Label>
@@ -100,48 +107,13 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
                             </div>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                             <Label>Poster / Gambar Kegiatan</Label>
-                            <input type="hidden" name="existingImage" value={initialData?.image || ''} />
-                            <div className="border-2 border-dashed rounded-lg hover:bg-muted/50 transition cursor-pointer relative bg-gray-50 dark:bg-gray-900/50 border-input h-[200px] flex items-center justify-center overflow-hidden">
-                                <Input
-                                    name="image"
-                                    type="file"
-                                    accept="image/*"
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0]
-                                        if (file) setImagePreview(URL.createObjectURL(file))
-                                    }}
-                                />
-                                {imagePreview ? (
-                                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center text-center p-4">
-                                        <div className="p-2 bg-muted rounded-full mb-2">
-                                            <CalendarIcon className="w-6 h-6 text-muted-foreground" />
-                                        </div>
-                                        <p className="font-medium text-sm">Klik untuk upload gambar</p>
-                                    </div>
-                                )}
-                                {imagePreview && (
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="icon"
-                                        className="absolute top-2 right-2 z-20 h-8 w-8 rounded-full opacity-80 hover:opacity-100"
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            setImagePreview("")
-                                            const fileInput = document.querySelector('input[name="image"]') as HTMLInputElement
-                                            if (fileInput) fileInput.value = ''
-                                        }}
-                                    >
-                                        <span className="sr-only">Hapus</span>
-                                        <Save className="w-4 h-4 rotate-45" /> {/* Using rotate for X icon substitution if needed, or stick to simple icon */}
-                                    </Button>
-                                )}
-                            </div>
+                            <ImageUpload
+                                name="image"
+                                defaultValue={initialData?.image}
+                                label="Poster Kegiatan"
+                            />
                         </div>
 
                         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
@@ -170,8 +142,8 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
 
                 {/* RIGHT: LIVE PREVIEW */}
                 <div className="hidden lg:block sticky top-6">
-                    <div className="bg-gray-100 dark:bg-gray-900/50 p-6 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
-                        <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                    <div className="/50 p-6 rounded-xl border border-dashed border-gray-300 dark:border-gray-700">
+                        <h3 className="text-sm font-semibold  mb-4 uppercase tracking-wider flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4" />
                             Live Preview
                         </h3>
@@ -200,7 +172,7 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
                                     <h4 className="font-bold text-lg leading-tight mb-2 line-clamp-2">
                                         {title || "Judul Kegiatan..."}
                                     </h4>
-                                    <div className="flex items-center text-sm text-muted-foreground">
+                                    <div className="flex items-center text-sm ">
                                         <span className="w-4 h-4 mr-2 flex items-center justify-center">📍</span>
                                         <span className="line-clamp-1">{location || "Lokasi kegiatan..."}</span>
                                     </div>
@@ -216,7 +188,7 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
                             </div>
                         </div>
 
-                        <p className="text-center text-xs text-muted-foreground mt-6">
+                        <p className="text-center text-xs  mt-6">
                             Preview tampilan kartu agenda di halaman publik.
                         </p>
                     </div>
@@ -225,3 +197,4 @@ export function AgendaForm({ action, initialData }: AgendaFormProps) {
         </form>
     )
 }
+

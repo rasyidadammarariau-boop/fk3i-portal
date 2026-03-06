@@ -1,64 +1,57 @@
-import "dotenv/config"
-import { PrismaClient } from '@prisma/client'
+﻿import "dotenv/config"
 import { hash } from 'bcryptjs'
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
-
-const connectionString = `${process.env.DATABASE_URL}`
-const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
-const prisma = new PrismaClient({ adapter })
+import prisma from '../lib/prisma'
 
 async function main() {
+    // === Hapus Data Lama Terlebih Dahulu ===
+    console.log("Menghapus data lama FK3I...")
+    await prisma.orgDocument.deleteMany()
+    await prisma.messageCategory.deleteMany()
+    await prisma.galleryImage.deleteMany()
+    await prisma.galleryAlbum.deleteMany()
+    await prisma.news.deleteMany()
+    await prisma.organizationProfile.deleteMany()
+    console.log("Data lama berhasil dihapus.")
+
+    // 1. User Account
     const password = await hash('admin123', 12)
     const user = await prisma.user.upsert({
-        where: { email: 'admin@fk3i.org' },
+        where: { email: 'admin@bempesantren.org' },
         update: {},
         create: {
-            email: 'admin@fk3i.org',
-            name: 'Admin FK3i',
+            email: 'admin@bempesantren.org',
+            name: 'Pusat BEM Pesantren',
             password,
             role: 'admin',
         },
     })
     console.log({ user })
 
-    // Dummy News Data
+    // 2. News Data
     const newsData = [
         {
-            title: "Muktamar Kyai Kampung Ke-5: Meneguhkan Peran Pesantren dalam Menjaga NKRI",
-            slug: "muktamar-kyai-kampung-ke-5",
-            content: "Forum Kyai Kampung Indonesia (FK3i) sukses menggelar Muktamar ke-5 yang dihadiri oleh ribuan kyai dari berbagai pelosok nusantara. Acara yang berlangsung khidmat ini menghasilkan beberapa rekomendasi penting terkait peran strategis pesantren dalam menjaga keutuhan Negara Kesatuan Republik Indonesia (NKRI) di tengah arus globalisasi dan radikalisme.\n\nKetua Umum FK3i dalam sambutannya menegaskan bahwa kyai kampung adalah benteng terakhir pertahanan moral bangsa. 'Kita mungkin tidak terlihat di panggung nasional setiap hari, tapi denyut nadi keagamaan masyarakat ada di tangan kita,' ujarnya disambut tepuk tangan riuh para hadirin.\n\nSelain membahas isu kebangsaan, muktamar juga menyoroti pentingnya kemandirian ekonomi pesantren. Beberapa model pemberdayaan ekonomi berbasis komunitas diperkenalkan sebagai solusi untuk menguatkan kemandirian umat.",
+            title: "Masa Ta'aruf Mahasiswa Santri Nasional 2026 Sukses Digelar",
+            slug: "mastama-nasional-2026",
+            content: "Ribuan mahasiswa santri dari berbagai pondok pesantren dan perguruan tinggi di Indonesia mengikuti agenda Masa Ta'aruf Mahasiswa (Mastama) Tingkat Nasional secara hibrida. Acara ini bertujuan mengokohkan ukhuwah islamiyah, wathoniyah, dan basyariyah di kalangan pemuda pencari ilmu.",
             image: "https://images.unsplash.com/photo-1519791883288-dc8bd696e667?q=80&w=2070&auto=format&fit=crop",
             published: true,
+            views: 450
         },
         {
-            title: "Gerakan Subuh Berjamaah: Menguatkan Spiritual, Merekatkan Sosial",
-            slug: "gerakan-subuh-berjamaah",
-            content: "FK3i meluncurkan program nasional 'Gerakan Subuh Berjamaah' yang serentak dilaksanakan di 34 provinsi. Gerakan ini bukan sekadar ritual ibadah, melainkan upaya untuk merekatkan kembali ikatan sosial masyarakat yang kian renggang.\n\nDi berbagai daerah, antusiasme masyarakat sangat tinggi. Masjid-masjid di kampung yang biasanya sepi saat subuh, kini mulai ramai oleh jamaah dari berbagai kalangan usia. Setelah sholat, kegiatan dilanjutkan dengan kuliah tujuh menit (kultum) dan sarapan bersama ala kadarnya, menciptakan suasana kehangatan dan kebersamaan.",
-            image: "https://images.unsplash.com/photo-1564121211835-e88c852648ab?q=80&w=2070&auto=format&fit=crop",
+            title: "Simposium Ekonomi Syariah BEM Pesantren Tingkat Nasional",
+            slug: "simposium-ekonomi-syariah",
+            content: "Dalam upaya mendorong kemandirian ekonomi pesantren, BEM Pesantren menggelar simposium yang mendiskusikan peta jalan pengembangan ekonomi syariah dan kewirausahaan di kalangan mahasiswa santri. Acara ini juga melahirkan berbagai Memorandum of Understanding dengan industri kreatif islami.",
+            image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2113&auto=format&fit=crop",
             published: true,
+            views: 310
         },
         {
-            title: "Pelatihan Digital untuk Dai Muda: Berdakwah di Era Milenial",
-            slug: "pelatihan-digital-dai-muda",
-            content: "Menyadari pentingnya adaptasi teknologi, FK3i mengadakan pelatihan literasi digital bagi para dai muda. Tujuannya adalah untuk mengisi ruang-ruang media sosial dengan konten dakwah yang sejuk, moderat, dan mencerahkan.\n\n'Jihad kita hari ini bukan angkat senjata, tapi angkat smartphone untuk menyebarkan kebaikan,' ujar salah satu pemateri. Para peserta diajarkan teknik pembuatan konten video pendek, desain grafis dasar, dan etika bermedia sosial.",
-            image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2070&auto=format&fit=crop",
+            title: "Pesantren Ramah Anak: BEM Pesantren Turun Gelar Sosialisasi",
+            slug: "pesantren-ramah-anak-sosialisasi",
+            content: "Untuk menyikapi isu kekerasan di ruang lingkup pendidikan, para kader BEM Pesantren serentak menyebarkan modul dan pendekatan pesantres ramah anak yang menitikberatkan pada kurikulum berbasis akhlakul karimah dan perlindungan komprehensif.",
+            image: "https://images.unsplash.com/photo-1596767784607-e836bfaea102?q=80&w=2070&auto=format&fit=crop",
             published: true,
-        },
-        {
-            title: "Bantuan Kemanusiaan untuk Korban Bencana Alam",
-            slug: "bantuan-kemanusiaan-bencana",
-            content: "Merespons bencana banjir yang melanda beberapa wilayah, Tim Reaksi Cepat FK3i langsung turun ke lapangan untuk menyalurkan bantuan logistik dan memberikan dukungan psikososial kepada para korban.\n\nBantuan berupa sembako, pakaian layak pakai, dan obat-obatan didistribusikan langsung ke posko-posko pengungsian. FK3i juga mengerahkan relawan santri untuk membantu membersihkan fasilitas umum pasca banjir.",
-            image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
-            published: true,
-        },
-        {
-            title: "Silaturahmi Kebangsaan: Merawat Kebhinekaan",
-            slug: "silaturahmi-kebangsaan",
-            content: "Dalam rangka memperingati Hari Kemerdekaan, FK3i menggelar dialog lintas agama dan budaya bertajuk 'Silaturahmi Kebangsaan'. Acara ini bertujuan untuk memperkuat tali persaudaraan sesama anak bangsa tanpa memandang suku, agama, dan ras.",
-            image: "https://images.unsplash.com/photo-1529070538774-1843cb6e65b3?q=80&w=2070&auto=format&fit=crop",
-            published: true,
+            views: 520
         }
     ]
 
@@ -71,49 +64,31 @@ async function main() {
     }
     console.log("Seeded News Data")
 
-    // Dummy Gallery Data
+    // 3. Gallery / Arsip Pergerakan Data
     const galleryData = [
         {
-            title: "Pengajian Akbar Bulanan",
-            slug: "pengajian-akbar-bulanan",
-            description: "Ribuan jamaah memadati alun-alun kota untuk mengikuti pengajian akbar.",
-            cover: "https://images.unsplash.com/photo-1609520778163-a16fb37d663d?q=80&w=2070&auto=format&fit=crop",
-            eventDate: new Date('2026-01-15'),
-        },
-        {
-            title: "Santunan Anak Yatim",
-            slug: "santunan-anak-yatim",
-            description: "Pembagian santunan rutin kepada anak yatim piatu di lingkungan sekitar.",
-            cover: "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2070&auto=format&fit=crop",
-            eventDate: new Date('2026-01-20'),
-        },
-        {
-            title: "Gotong Royong Pembangunan Masjid",
-            slug: "gotong-royong-pembangunan-masjid",
-            description: "Warga dan santri bahu-membahu dalam proses pengecoran dak masjid.",
-            cover: "https://images.unsplash.com/photo-1588611910672-8789366113b2?q=80&w=2070&auto=format&fit=crop",
+            title: "Pelantikan Pengurus Pusat BEM Pesantren Nusantara",
+            slug: "pelantikan-pengurus-2026",
+            description: "Prosesi sakral pelantikan pengurus pusat periode 2026 di Jakarta.",
+            cover: "https://images.unsplash.com/photo-1588636402447-fd150b4ec2b5?q=80&w=2070&auto=format&fit=crop",
             eventDate: new Date('2026-01-10'),
+            activityType: "silatnas"
         },
         {
-            title: "Rapat Koordinasi Wilayah",
-            slug: "rapat-koordinasi-wilayah",
-            description: "Pengurus wilayah FK3i sedang membahas program kerja tahunan.",
-            cover: "https://images.unsplash.com/photo-1577962917302-cd874c4e31d2?q=80&w=2032&auto=format&fit=crop",
-            eventDate: new Date('2026-01-05'),
+            title: "Aksi Solidaritas Kemanusiaan Global",
+            slug: "aksi-solidaritas-kemanusiaan",
+            description: "Aksi damai oleh gabungan BEM Pesantren menyerukan kebebasan dan keadilan hak asasi manusia.",
+            cover: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2084&auto=format&fit=crop",
+            eventDate: new Date('2025-11-20'),
+            activityType: "aksi"
         },
         {
-            title: "Festival Hadroh Nusantara",
-            slug: "festival-hadroh-nusantara",
-            description: "Penampilan grup hadroh santri dalam rangka memeriahkan hari santri.",
-            cover: "https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=2070&auto=format&fit=crop",
-            eventDate: new Date('2025-12-28'),
-        },
-        {
-            title: "Panen Raya Pesantren",
-            slug: "panen-raya-pesantren",
-            description: "Hasil bumi dari lahan pertanian yang dikelola oleh koperasi pesantren.",
-            cover: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=2070&auto=format&fit=crop",
-            eventDate: new Date('2025-12-20'),
+            title: "Audiensi Modul Kurikulum Merdeka di Kemenag",
+            slug: "audiensi-kurikulum-kemenag",
+            description: "Tim Pendidikan & Riset BEM Pesantren menyerahkan telaah kritis terkait kurikulum agama kepada Dirjen Pendis.",
+            cover: "https://images.unsplash.com/photo-1603513364956-6f116a4f7287?q=80&w=2071&auto=format&fit=crop",
+            eventDate: new Date('2025-12-05'),
+            activityType: "audiensi"
         }
     ]
 
@@ -126,69 +101,28 @@ async function main() {
     }
     console.log("Seeded Gallery Data")
 
-    // Dummy Agenda Data
-    const agendaData = [
-        {
-            title: "Musyawarah Kerja Wilayah Jawa Tengah",
-            slug: "muskerwil-jateng-2026",
-            description: "Forum strategis untuk merumuskan program kerja tahunan FK3i wilayah Jawa Tengah, dihadiri oleh perwakilan dari 35 kabupaten/kota.",
-            date: new Date('2026-02-12'),
-            location: "Pesantren Al-Hikmah, Semarang"
-        },
-        {
-            title: "Pelatihan Digital Marketing Santri",
-            slug: "pelatihan-digital-santri",
-            description: "Workshop intensif selama 3 hari untuk membekali santri dengan kemampuan pemasaran digital dan kewirausahaan online.",
-            date: new Date('2026-02-25'),
-            location: "Aula FK3i Pusat, Jakarta"
-        },
-        {
-            title: "Pengajian Akbar Menyambut Ramadhan",
-            slug: "pengajian-akbar-ramadhan-1447",
-            description: "Tabligh akbar dalam rangka tarhib Ramadhan, mengundang penceramah nasional dan dimeriahkan oleh grup sholawat ternama.",
-            date: new Date('2026-03-10'),
-            location: "Masjid Agung Surabaya"
-        },
-    ]
-
-    for (const item of agendaData) {
-        await prisma.agenda.upsert({
-            where: { slug: item.slug },
-            update: {},
-            create: item
-        })
-    }
-    console.log("Seeded Agenda Data")
-
-    // Seed Message Categories
+    // 4. Message Categories
     const categories = [
         {
-            name: "Undangan Kegiatan / Ceramah",
-            slug: "undangan",
-            description: "Undangan untuk mengisi ceramah, tabligh, atau kegiatan keagamaan",
+            name: "Undangan Kegiatan / Tabligh",
+            slug: "undangan-kegiatan",
+            description: "Agenda majelis kehormatan, simposium, maupun undangan kemahasiswaan.",
             icon: "Calendar",
             order: 1
         },
         {
-            name: "Usulan Kerjasama",
-            slug: "kerjasama",
-            description: "Proposal kerjasama program atau kegiatan",
-            icon: "Handshake",
+            name: "Laporan & Advokasi Kasus",
+            slug: "laporan-advokasi",
+            description: "Pengaduan diskriminasi atau kebutuhan pendampingan advokasi.",
+            icon: "AlertTriangle",
             order: 2
         },
         {
-            name: "Aspirasi / Masukan",
-            slug: "aspirasi",
-            description: "Saran, kritik, atau masukan untuk organisasi",
-            icon: "MessageSquare",
+            name: "Usulan Kerja Sama / Sponsor",
+            slug: "usulan-kerjasama",
+            description: "Tawaran kolaborasi program strategis CSR dari perusahaan atau lembaga.",
+            icon: "Handshake",
             order: 3
-        },
-        {
-            name: "Lainnya",
-            slug: "lainnya",
-            description: "Pertanyaan atau keperluan lainnya",
-            icon: "HelpCircle",
-            order: 4
         }
     ]
 
@@ -201,30 +135,93 @@ async function main() {
     }
     console.log("Seeded Message Categories")
 
-    // Seed Organization Profile
+    // 5. Repositori Dokumen
+    const dokumenData = [
+        {
+            title: "AD/ART BEM Pesantren Indonesia",
+            fileName: "AD_ART_BEM_PESANTREN.pdf",
+            fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            description: "Dokumen konstitusi dasar organisasi kemahasiswaan santri nasional.",
+            category: "ad-art",
+            published: true,
+            uploadedBy: "Sekretaris Jenderal",
+            downloadCount: 150
+        },
+        {
+            title: "Garis Besar Haluan Organisasi (GBHO)",
+            fileName: "GBHO_BEM_PESANTREN.pdf",
+            fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            description: "Peta jalan arah kebijakan organisasi tiga periode ke depan.",
+            category: "gbho",
+            published: true,
+            uploadedBy: "Ketua BPO",
+            downloadCount: 88
+        },
+        {
+            title: "SOP Administrasi Kesekretariatan Nasional",
+            fileName: "SOP_Administrasi.pdf",
+            fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+            description: "Standar operasional prosedur terkait administrasi surat menyurat, pengarsipan, dan tata kelola kantor.",
+            category: "sop",
+            published: true,
+            uploadedBy: "Badan Administrasi",
+            downloadCount: 75
+        }
+    ]
+
+    for (const doc of dokumenData) {
+        const existing = await prisma.orgDocument.findFirst({ where: { fileName: doc.fileName } })
+        if (existing) {
+            await prisma.orgDocument.update({ where: { id: existing.id }, data: doc })
+        } else {
+            await prisma.orgDocument.create({ data: doc })
+        }
+    }
+    console.log("Seeded Org Documents")
+
+    // 6. Organization Profile
     await prisma.organizationProfile.upsert({
         where: { id: "default" },
-        update: {},
-        create: {
-            id: "default",
-            email: "sekretariat@fk3i.or.id",
-            emailSecondary: "humas@fk3i.or.id",
-            phone: "+62 21 1234 5678",
-            whatsapp: "6281234567890",
-            whatsappSecondary: "6285678901234",
-            address: "Jl. Kramat Raya No. 164",
+        update: {
+            email: "pusat@bempesantren.org",
+            emailSecondary: "humas@bempesantren.org",
+            phone: "+62 811 1234 5678",
+            whatsapp: "6281112345678",
+            whatsappSecondary: "6285512345678",
+            address: "Jl. Kyai Haji Wahid Hasyim No. 12, Menteng",
             city: "Jakarta Pusat",
             province: "DKI Jakarta",
-            postalCode: "10430",
-            facebook: "https://facebook.com/fk3i",
-            instagram: "https://instagram.com/fk3i",
-            twitter: "https://twitter.com/fk3i",
-            youtube: "https://youtube.com/@fk3i",
-            shortDescription: "Wadah silaturahmi kyai kampung yang bergerak dalam penguatan dakwah, pendidikan, dan ekonomi umat di akar rumput.",
-            longDescription: "Forum Kyai Kampung Indonesia (FK3i) adalah organisasi yang menghimpun para kyai dan ulama di tingkat kampung/desa untuk bersama-sama mengembangkan dakwah Islam yang moderat, menjaga tradisi Ahlussunnah wal Jamaah, serta memberdayakan ekonomi umat.",
-            vision: "Menjadi lokomotif pergerakan kyai kampung dalam mewujudkan tatanan masyarakat yang religius, moderat, dan sejahtera dalam bingkai NKRI.",
-            mission: "1. Melestarikan ajaran Islam Ahlussunnah wal Jamaah An-Nahdliyah dan kearifan lokal\n2. Mengukuhkan komitmen kebangsaan dan cinta tanah air sebagai bagian dari iman\n3. Membangun kemandirian ekonomi kyai dan pesantren melalui kewirausahaan sosial",
-            history: "Bermula dari kegelisahan para kyai di pelosok desa yang merasakan perlunya wadah komunikasi untuk merespons tantangan zaman, Forum Kyai Kampung Indonesia lahir. Bukan dari istana, melainkan dari surau-surau kecil yang tak pernah lelah mengumandangkan adzan dan mengajarkan alif-ba-ta. Kini, FK3i telah tumbuh menjadi kekuatan moral yang diperhitungkan, dengan ribuan anggota yang tersebar di seluruh provinsi, terus berkhidmat tanpa pamrih untuk agama dan bangsa."
+            postalCode: "10340",
+            facebook: "https://facebook.com/bempesantren_id",
+            instagram: "https://instagram.com/bempesantren_id",
+            twitter: "https://twitter.com/bempesantren",
+            youtube: "https://youtube.com/@bempesantren_official",
+            shortDescription: "Wadah perjuangan dan silaturahmi mahasiswa santri dari seluruh Indonesia guna mendorong terwujudnya intelektual muslim bermartabat.",
+            longDescription: "BEM Pesantren Indonesia adalah aliansi strategis badan eksekutif mahasiswa yang memiliki kultur, nasab, maupun latar belakang pondok pesantren dari seluruh Indonesia. Fokus kami tidak hanya pada retorika politik kampus, melainkan memberdayakan santri di dunia perguruan tinggi untuk proaktif memajukan keilmuan dan sosial-kemasyarakatan, serta menghadirkan islam yang ramah sesuai ajaran ulama Nusantara.",
+            vision: "Menjadi pelopor generasi muslim terpelajar yang moderat (wasathiyah), inovatif, dan berakhlak mulia untuk kemajuan esensi agama dan bangsa.",
+            mission: "1. Menguatkan manifestasi dan ukhuwah antar BEM serta elemen santri se-Nusantara.\n2. Mewujudkan pemberdayaan akademik, pergerakan sosial, dan kemandirian ekonomi.\n3. Berperan aktif dan kritis dalam advokasi kebijakan publik yang mengedepankan maslahat kerakyatan.\n4. Merawat, mendongkrak, dan mengartikulasikan tradisi intelektual ulama salaf di ruang publik kebangsaan.",
+            history: "Bermula dari kegelisahan beberapa aktivis mahasiswa lintas universitas akan minimnya sinergi mahasiswa berlatar belakang pesantren, diinisiasi musyawarah agung perdana pada era reformasi..."
+        },
+        create: {
+            id: "default",
+            email: "pusat@bempesantren.org",
+            emailSecondary: "humas@bempesantren.org",
+            phone: "+62 811 1234 5678",
+            whatsapp: "6281112345678",
+            whatsappSecondary: "6285512345678",
+            address: "Jl. Kyai Haji Wahid Hasyim No. 12, Menteng",
+            city: "Jakarta Pusat",
+            province: "DKI Jakarta",
+            postalCode: "10340",
+            facebook: "https://facebook.com/bempesantren_id",
+            instagram: "https://instagram.com/bempesantren_id",
+            twitter: "https://twitter.com/bempesantren",
+            youtube: "https://youtube.com/@bempesantren_official",
+            shortDescription: "Wadah perjuangan dan silaturahmi mahasiswa santri dari seluruh Indonesia guna mendorong terwujudnya intelektual muslim bermartabat.",
+            longDescription: "BEM Pesantren Indonesia adalah aliansi strategis badan eksekutif mahasiswa yang memiliki kultur, nasab, maupun latar belakang pondok pesantren dari seluruh Indonesia. Fokus kami tidak hanya pada retorika politik kampus, melainkan memberdayakan santri di dunia perguruan tinggi untuk proaktif memajukan keilmuan dan sosial-kemasyarakatan, serta menghadirkan islam yang ramah sesuai ajaran ulama Nusantara.",
+            vision: "Menjadi pelopor generasi muslim terpelajar yang moderat (wasathiyah), inovatif, dan berakhlak mulia untuk kemajuan esensi agama dan bangsa.",
+            mission: "1. Menguatkan manifestasi dan ukhuwah antar BEM serta elemen santri se-Nusantara.\n2. Mewujudkan pemberdayaan akademik, pergerakan sosial, dan kemandirian ekonomi.\n3. Berperan aktif dan kritis dalam advokasi kebijakan publik yang mengedepankan maslahat kerakyatan.\n4. Merawat, mendongkrak, dan mengartikulasikan tradisi intelektual ulama salaf di ruang publik kebangsaan.",
+            history: "Bermula dari kegelisahan beberapa aktivis mahasiswa lintas universitas akan minimnya sinergi mahasiswa berlatar belakang pesantren, diinisiasi musyawarah agung perdana pada era reformasi..."
         }
     })
     console.log("Seeded Organization Profile")

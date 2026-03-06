@@ -5,11 +5,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { CalendarIcon, ArrowLeft, Image as ImageIcon } from "lucide-react"
+import { CalendarIcon, ArrowLeft, MapPin } from "lucide-react"
 import Link from "next/link"
 import { createAlbum } from "../actions"
 import { useActionState, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { ImageUpload } from "@/components/admin/image-upload"
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from "@/components/ui/select"
 import {
     Popover,
     PopoverContent,
@@ -30,6 +34,7 @@ export default function CreateAlbumPage() {
     const [status, setStatus] = useState<'draft' | 'published'>('published')
     const [date, setDate] = useState<Date>(new Date())
     const [imagePreview, setImagePreview] = useState("")
+    const [activityType, setActivityType] = useState('kegiatan')
 
     useEffect(() => {
         if (state?.error) {
@@ -47,7 +52,7 @@ export default function CreateAlbumPage() {
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold">Buat Album Baru</h1>
-                    <p className="text-muted-foreground">Kumpulkan foto kegiatan dalam satu album.</p>
+                    <p className="">Kumpulkan foto kegiatan dalam satu album.</p>
                 </div>
             </div>
 
@@ -63,7 +68,34 @@ export default function CreateAlbumPage() {
                             <form action={formAction} className="space-y-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="title">Nama Album / Kegiatan</Label>
-                                    <Input id="title" name="title" placeholder="Contoh: Kegiatan Bakti Sosial 2024" required />
+                                    <Input id="title" name="title" placeholder="Contoh: Aksi Tolak RUU di DPR 2025" required />
+                                </div>
+
+                                {/* Jenis Kegiatan */}
+                                <div className="space-y-2">
+                                    <Label>Jenis Kegiatan</Label>
+                                    <input type="hidden" name="activityType" value={activityType} />
+                                    <Select value={activityType} onValueChange={setActivityType}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih jenis kegiatan..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="aksi"> Aksi / Demonstrasi</SelectItem>
+                                            <SelectItem value="audiensi"> Audiensi / Advokasi</SelectItem>
+                                            <SelectItem value="silatnas"> Silatnas / Konsolidasi</SelectItem>
+                                            <SelectItem value="kajian"> Kajian / Diskusi Publik</SelectItem>
+                                            <SelectItem value="pengabdian"> Pengabdian Masyarakat</SelectItem>
+                                            <SelectItem value="kegiatan"> Kegiatan Umum</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Lokasi */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="location" className="flex items-center gap-1">
+                                        <MapPin className="w-3.5 h-3.5" /> Lokasi
+                                    </Label>
+                                    <Input id="location" name="location" placeholder="Jakarta, Gedung DPR, Kementerian..." />
                                 </div>
 
                                 <div className="space-y-2 flex flex-col">
@@ -75,7 +107,7 @@ export default function CreateAlbumPage() {
                                                 variant={"outline"}
                                                 className={cn(
                                                     "w-full justify-start text-left font-normal",
-                                                    !date && "text-muted-foreground"
+                                                    !date && ""
                                                 )}
                                             >
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -98,36 +130,14 @@ export default function CreateAlbumPage() {
                                     <Textarea id="description" name="description" placeholder="Deskripsikan kegiatan ini..." />
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     <Label>Cover Album (Opsional)</Label>
-                                    <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition cursor-pointer relative">
-                                        <Input
-                                            name="cover"
-                                            type="file"
-                                            accept="image/*"
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0]
-                                                if (file) setImagePreview(URL.createObjectURL(file))
-                                            }}
-                                        />
-                                        {imagePreview ? (
-                                            <div className="relative">
-                                                <img src={imagePreview} className="max-h-48 rounded shadow-sm object-contain" alt="Preview" />
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded text-white text-sm font-medium">
-                                                    Ganti Cover
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="p-3 bg-muted rounded-full mb-3">
-                                                    <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                                                </div>
-                                                <p className="text-sm font-medium">Klik untuk upload cover</p>
-                                                <p className="text-xs text-muted-foreground">JPG, PNG, WebP (Max 2MB)</p>
-                                            </>
-                                        )}
-                                    </div>
+                                    <ImageUpload
+                                        name="cover"
+                                        label="Cover Album"
+                                        onPreviewChange={setImagePreview}
+                                    />
+                                    <p className="text-xs text-muted-foreground">Gambar otomatis dikonversi ke WebP.</p>
                                 </div>
 
                                 <div className="pt-4 border-t flex flex-col sm:flex-row justify-end gap-3">
@@ -167,7 +177,7 @@ export default function CreateAlbumPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-2 gap-3 h-[200px] items-center justify-center text-center bg-muted/30 rounded-lg border-2 border-dashed">
-                                <p className="col-span-2 text-sm text-muted-foreground p-4">
+                                <p className="col-span-2 text-sm  p-4">
                                     Area ini akan aktif setelah album dibuat.
                                 </p>
                             </div>
@@ -179,3 +189,4 @@ export default function CreateAlbumPage() {
         </div>
     )
 }
+

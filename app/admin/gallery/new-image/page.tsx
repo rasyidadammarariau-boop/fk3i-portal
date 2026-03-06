@@ -38,7 +38,7 @@ export default function UploadImagePage() {
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold">Upload Foto</h1>
-                    <p className="text-muted-foreground">Upload foto lepas tanpa album.</p>
+                    <p className="">Upload foto lepas tanpa album.</p>
                 </div>
             </div>
 
@@ -52,7 +52,7 @@ export default function UploadImagePage() {
 
                         <div className="space-y-4">
                             <Label>File Foto</Label>
-                            <div className="border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center text-center hover:bg-gray-50 dark:hover:bg-gray-900 transition cursor-pointer relative min-h-[300px]">
+                            <div className="border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition cursor-pointer relative min-h-[300px]">
                                 <Input
                                     name="image"
                                     type="file"
@@ -73,11 +73,11 @@ export default function UploadImagePage() {
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-full mb-4">
-                                            <UploadCloud className="w-10 h-10 text-blue-500" />
+                                        <div className="p-4 bg-muted rounded-full mb-4">
+                                            <UploadCloud className="w-10 h-10 " />
                                         </div>
                                         <p className="text-lg font-medium">Drag & drop atau klik untuk upload</p>
-                                        <p className="text-sm text-muted-foreground mt-2">Mendukung JPG, PNG, WebP (Max 5MB)</p>
+                                        <p className="text-sm  mt-2">Mendukung JPG, PNG, WebP (Max 5MB)</p>
                                     </>
                                 )}
                             </div>
@@ -116,3 +116,4 @@ export default function UploadImagePage() {
         </div>
     )
 }
+

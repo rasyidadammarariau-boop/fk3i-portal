@@ -13,7 +13,7 @@ const categorySchema = z.object({
     order: z.number().int().default(0),
 })
 
-export async function createCategory(prevState: any, formData: FormData) {
+export async function createCategory(prevState: unknown, formData: FormData) {
     const rawData = {
         name: formData.get('name'),
         slug: formData.get('slug'),
@@ -36,8 +36,8 @@ export async function createCategory(prevState: any, formData: FormData) {
 
         revalidatePath('/admin/message-categories')
         return { success: true, message: "Kategori berhasil ditambahkan" }
-    } catch (error: any) {
-        if (error.code === 'P2002') {
+    } catch (error: unknown) {
+        if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: string }).code === 'P2002') {
             return { error: 'Slug sudah digunakan' }
         }
         console.error('Create category error:', error)
@@ -45,7 +45,7 @@ export async function createCategory(prevState: any, formData: FormData) {
     }
 }
 
-export async function updateCategory(id: string, prevState: any, formData: FormData) {
+export async function updateCategory(id: string, prevState: unknown, formData: FormData) {
     const rawData = {
         name: formData.get('name'),
         slug: formData.get('slug'),
@@ -69,8 +69,8 @@ export async function updateCategory(id: string, prevState: any, formData: FormD
 
         revalidatePath('/admin/message-categories')
         return { success: true, message: "Kategori berhasil diperbarui" }
-    } catch (error: any) {
-        if (error.code === 'P2002') {
+    } catch (error: unknown) {
+        if (typeof error === 'object' && error !== null && 'code' in error && (error as { code: string }).code === 'P2002') {
             return { error: 'Slug sudah digunakan' }
         }
         console.error('Update category error:', error)
@@ -106,3 +106,4 @@ export async function toggleCategoryPublished(id: string, published: boolean) {
         return { error: 'Gagal mengupdate status kategori' }
     }
 }
+

@@ -2,76 +2,125 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
-import { z } from "zod"
 import { redirect } from "next/navigation"
 import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+import sharp from "sharp"
+import { auth } from "@/lib/auth"
 
-const newsSchema = z.object({
-    title: z.string().min(3, "Judul minimal 3 karakter"),
-    content: z.string().min(10, "Konten minimal 10 karakter"),
-    image: z.string().optional().or(z.literal('')),
-    categoryId: z.string().min(1, "Kategori wajib diisi"),
-    excerpt: z.string().optional(),
-    tags: z.string().optional(),
-    author: z.string().optional(),
-    published: z.coerce.boolean().default(true)
-})
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
 
-async function uploadImage(file: File): Promise<string | null> {
+async function uploadFile(file: File, type: 'image' | 'document'): Promise<string | null> {
     if (!file || file.size === 0 || file.name === 'undefined') return null
-
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Create uploads directory if not exists
-    const uploadDir = join(process.cwd(), "public", "uploads")
+    const subDir = type === 'image' ? 'uploads' : 'documents'
+    const uploadDir = join(process.cwd(), "public", subDir)
+
     await mkdir(uploadDir, { recursive: true })
-
-    // Sanitize filename
     const sanitizedFilename = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
-    const filename = `${Date.now()}-${sanitizedFilename}`
-    const filepath = join(uploadDir, filename)
 
-    await writeFile(filepath, buffer)
-    return `/uploads/${filename}`
-}
+    let filename = `${Date.now()}-${sanitizedFilename}`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let finalBuffer: Buffer<ArrayBufferLike> = buffer as Buffer<ArrayBufferLike>
 
-export async function createNews(prevState: any, formData: FormData) {
-    const imageFile = formData.get('image') as File
-    const uploadedImagePath = await uploadImage(imageFile)
-
-    const rawData = {
-        title: formData.get('title'),
-        content: formData.get('content'),
-        image: uploadedImagePath || '',
-        categoryId: formData.get('categoryId'),
-        excerpt: formData.get('excerpt'),
-        tags: formData.get('tags'),
-        author: formData.get('author'),
-        published: formData.get('status') === 'published',
+    if (type === 'image') {
+        try {
+            const nameWithoutExt = sanitizedFilename.includes('.') ? sanitizedFilename.substring(0, sanitizedFilename.lastIndexOf('.')) : sanitizedFilename
+            filename = `${Date.now()}-${nameWithoutExt}.webp`
+            finalBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer()
+        } catch {
+            // fallback
+            filename = `${Date.now()}-${sanitizedFilename}`
+        }
     }
 
-    // Generate slug from title
-    const slugBase = rawData.title?.toString().toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '') || 'untitled';
+    await writeFile(join(uploadDir, filename), finalBuffer)
+    return `/${subDir}/${filename}`
+}
 
-    // Add random string to ensure uniqueness
-    const slug = `${slugBase}-${Date.now().toString().slice(-6)}`;
+/** Hitung estimasi waktu baca dari konten HTML (strip tag, hitung kata) */
+function calculateReadTime(content: string): number {
+    const plainText = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+    const wordCount = plainText.split(' ').filter(Boolean).length
+    return Math.max(1, Math.ceil(wordCount / 200)) // 200 kata/menit
+}
+
+/** Generate atau find tag, return IDs */
+async function upsertTags(tagNames: string[]): Promise<string[]> {
+    const ids: string[] = []
+    for (const name of tagNames) {
+        if (!name.trim()) continue
+        const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        const tag = await prisma.tag.upsert({
+            where: { slug },
+            update: {},
+            create: { name: name.trim(), slug },
+        })
+        ids.push(tag.id)
+    }
+    return ids
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────────────────
+
+export async function createNews(prevState: unknown, formData: FormData) {
+    const session = await auth()
+    const sessionUserName = session?.user?.name || ''
+
+    const imageMode = formData.get('imageMode') as string
+    let finalImagePath = ''
+    if (imageMode === 'url' || imageMode === 'gallery') {
+        finalImagePath = formData.get('imageUrl') as string || ''
+    } else {
+        finalImagePath = formData.get('image') as string || ''
+    }
+
+    const attachmentFile = formData.get('attachment') as File
+    const uploadedAttachmentPath = await uploadFile(attachmentFile, 'document')
+    const attachmentName = formData.get('attachmentName') as string || (attachmentFile?.name !== 'undefined' ? attachmentFile?.name : null)
+
+    const content = formData.get('content') as string
+    const tagsRaw = formData.get('tags') as string || ''
+    const tagNames = tagsRaw.split(',').map(t => t.trim()).filter(Boolean)
+    const readTime = calculateReadTime(content)
+
+    const publishedAtRaw = formData.get('publishedAt') as string
+    const featured = formData.get('featured') === 'on'
+    const metaTitle = formData.get('metaTitle') as string
+    const metaDescription = formData.get('metaDescription') as string
+
+    const title = formData.get('title') as string
+    const slugBase = title.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '') || 'untitled'
+    const slug = `${slugBase}-${Date.now().toString().slice(-6)}`
 
     try {
+        const tagIds = await upsertTags(tagNames)
+
         await prisma.news.create({
             data: {
-                title: rawData.title as string,
-                content: rawData.content as string,
-                image: rawData.image as string,
-                categoryId: rawData.categoryId as string,
-                excerpt: rawData.excerpt as string,
-                tags: rawData.tags as string,
-                author: rawData.author as string,
-                published: rawData.published,
+                title,
+                content,
+                image: finalImagePath,
+                categoryId: formData.get('categoryId') as string || null,
+                excerpt: formData.get('excerpt') as string || null,
+                author: (formData.get('author') as string) || sessionUserName || null,
+                tags: tagsRaw || null,
+                readTime,
+                published: formData.get('status') === 'published',
+                featured,
+                attachmentUrl: uploadedAttachmentPath || null,
+                attachmentName: uploadedAttachmentPath ? attachmentName : null,
+                publishedAt: publishedAtRaw ? new Date(publishedAtRaw) : null,
+                metaTitle: metaTitle || null,
+                metaDescription: metaDescription || null,
                 slug,
+                tagRelations: tagIds.length > 0 ? {
+                    create: tagIds.map(tagId => ({ tagId }))
+                } : undefined,
             }
         })
     } catch (error) {
@@ -80,44 +129,83 @@ export async function createNews(prevState: any, formData: FormData) {
     }
 
     revalidatePath('/admin/news')
+    revalidatePath('/news')
+    revalidatePath('/')
     redirect('/admin/news')
 }
 
-export async function updateNews(id: string, prevState: any, formData: FormData) {
-    const imageFile = formData.get('image') as File
-    const existingImage = formData.get('existingImage') as string
+export async function updateNews(id: string, prevState: unknown, formData: FormData) {
+    const session = await auth()
+    const sessionUserName = session?.user?.name || ''
 
+    const imageMode = formData.get('imageMode') as string
+    const existingImage = formData.get('existingImage') as string
     let finalImage = existingImage
 
-    // Upload new image if exists
-    const uploadedImagePath = await uploadImage(imageFile)
-    if (uploadedImagePath) {
-        finalImage = uploadedImagePath
+    if (imageMode === 'url' || imageMode === 'gallery') {
+        const inputUrl = formData.get('imageUrl') as string
+        if (inputUrl) finalImage = inputUrl
+    } else {
+        const uploadUrl = formData.get('image') as string
+        if (uploadUrl) finalImage = uploadUrl
     }
 
-    const rawData = {
-        title: formData.get('title'),
-        content: formData.get('content'),
-        image: finalImage,
-        categoryId: formData.get('categoryId'),
-        excerpt: formData.get('excerpt'),
-        tags: formData.get('tags'),
-        author: formData.get('author'),
-        published: formData.get('status') === 'published',
+    const attachmentFile = formData.get('attachment') as File
+    const existingAttachment = formData.get('existingAttachmentUrl') as string
+    let finalAttachmentUrl = existingAttachment || null
+    let finalAttachmentName = formData.get('attachmentName') as string || formData.get('existingAttachmentName') as string || null
+
+    const uploadedAttachmentPath = await uploadFile(attachmentFile, 'document')
+    if (uploadedAttachmentPath) {
+        finalAttachmentUrl = uploadedAttachmentPath
+        if (!formData.get('attachmentName')) {
+            finalAttachmentName = attachmentFile.name
+        }
     }
+
+    // fitur hapus lampiran (kalau user kosongkan field tapi ga upload)
+    if (formData.get('removeAttachment') === 'true') {
+        finalAttachmentUrl = null
+        finalAttachmentName = null
+    }
+
+    const content = formData.get('content') as string
+    const tagsRaw = formData.get('tags') as string || ''
+    const tagNames = tagsRaw.split(',').map(t => t.trim()).filter(Boolean)
+    const readTime = calculateReadTime(content)
+
+    const publishedAtRaw = formData.get('publishedAt') as string
+    const featured = formData.get('featured') === 'on'
+    const metaTitle = formData.get('metaTitle') as string
+    const metaDescription = formData.get('metaDescription') as string
 
     try {
+        const tagIds = await upsertTags(tagNames)
+
+        // Hapus tag lama, buat yang baru
+        await prisma.newsTag.deleteMany({ where: { newsId: id } })
+
         await prisma.news.update({
             where: { id },
             data: {
-                title: rawData.title as string,
-                content: rawData.content as string,
-                image: rawData.image as string, // Safe URL string
-                categoryId: rawData.categoryId as string,
-                excerpt: rawData.excerpt as string,
-                tags: rawData.tags as string,
-                author: rawData.author as string,
-                published: rawData.published,
+                title: formData.get('title') as string,
+                content,
+                image: finalImage,
+                categoryId: formData.get('categoryId') as string || null,
+                excerpt: formData.get('excerpt') as string || null,
+                author: (formData.get('author') as string) || sessionUserName || null,
+                tags: tagsRaw || null,
+                readTime,
+                published: formData.get('status') === 'published',
+                featured,
+                attachmentUrl: finalAttachmentUrl,
+                attachmentName: finalAttachmentName,
+                publishedAt: publishedAtRaw ? new Date(publishedAtRaw) : null,
+                metaTitle: metaTitle || null,
+                metaDescription: metaDescription || null,
+                tagRelations: tagIds.length > 0 ? {
+                    create: tagIds.map(tagId => ({ tagId }))
+                } : undefined,
             }
         })
     } catch (error) {
@@ -126,5 +214,51 @@ export async function updateNews(id: string, prevState: any, formData: FormData)
     }
 
     revalidatePath('/admin/news')
+    revalidatePath('/news')
+    revalidatePath('/')
     redirect('/admin/news')
+}
+
+export async function toggleFeatured(id: string, currentFeatured: boolean) {
+    try {
+        // Jika set featured, unset yang lain dulu
+        if (!currentFeatured) {
+            await prisma.news.updateMany({
+                where: { featured: true },
+                data: { featured: false }
+            })
+        }
+        await prisma.news.update({
+            where: { id },
+            data: { featured: !currentFeatured }
+        })
+        revalidatePath('/admin/news')
+        revalidatePath('/news')
+        revalidatePath('/')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: (error as Error).message }
+    }
+}
+
+export async function incrementViews(id: string) {
+    try {
+        await prisma.news.update({
+            where: { id },
+            data: { views: { increment: 1 } }
+        })
+    } catch {
+        // Silent fail — tidak kritis
+    }
+}
+
+export async function deleteNewsBulk(ids: string[]) {
+    try {
+        await prisma.news.deleteMany({ where: { id: { in: ids } } })
+        revalidatePath('/admin/news')
+        revalidatePath('/news')
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: (error as Error).message }
+    }
 }

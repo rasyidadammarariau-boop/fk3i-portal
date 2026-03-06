@@ -13,7 +13,7 @@ interface BreadcrumbProps {
 export function Breadcrumb({ items }: BreadcrumbProps) {
     return (
         <nav aria-label="Breadcrumb" className="mb-6">
-            <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <ol className="flex items-center space-x-2 text-sm ">
                 <li>
                     <Link href="/" className="hover:text-primary transition-colors">
                         <Home className="w-4 h-4" />
@@ -27,7 +27,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
                                 {item.label}
                             </Link>
                         ) : (
-                            <span className="text-foreground font-semibold line-clamp-1 max-w-[200px] md:max-w-none">
+                            <span className=" font-semibold line-clamp-1 max-w-[200px] md:max-w-none">
                                 {item.label}
                             </span>
                         )}
@@ -37,3 +37,4 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         </nav>
     )
 }
+

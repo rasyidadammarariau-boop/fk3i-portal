@@ -1,86 +1,127 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import Image from "next/image"
+import { Menu } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/toggle-theme"
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
+
+const navItems = [
+    { name: "Beranda", href: "/" },
+    { name: "Tentang Kami", href: "/about" },
+    { name: "Berita", href: "/news" },
+    { name: "Arsip Pergerakan", href: "/gallery" },
+    { name: "Dokumen", href: "/documents" },
+    { name: "Hubungi Kami", href: "/contact" },
+]
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
+    const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20)
-        }
+        setMounted(true)
+        const handleScroll = () => setScrolled(window.scrollY > 20)
         window.addEventListener("scroll", handleScroll)
+        // trigger initial check
+        handleScroll()
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
-    const navItems = [
-        { name: "Beranda", href: "/" },
-        { name: "Tentang Kami", href: "/about" },
-        { name: "Agenda", href: "/agenda" },
-        { name: "Berita", href: "/news" },
-        { name: "Galeri", href: "/gallery" },
-        { name: "Hubungi Kami", href: "/contact" },
-    ]
-
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-white/90 backdrop-blur-md shadow-md py-2 border-b border-border/50 text-foreground" : "bg-transparent py-6 text-white"}`}>
-            <div className="container mx-auto px-6">
+        <nav
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+                    ? "bg-background/95 backdrop-blur-md shadow-sm py-2 border-b border-border"
+                    : "bg-background py-3 md:py-6"
+                }`}
+        >
+            <div className="container mx-auto px-4 md:px-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                        <Link href="/" className="font-serif font-bold text-2xl flex items-center gap-2 group">
-                            <span className={`flex items-center justify-center w-10 h-10 rounded-lg text-lg font-bold transition-colors ${scrolled ? "bg-primary text-white" : "bg-white text-primary"}`}>
-                                F
-                            </span>
-                            <span className="tracking-tight group-hover:opacity-80 transition-opacity">FK3i</span>
-                        </Link>
-                    </div>
+                    {/* Logo */}
+                    <Link href="/" className="font-serif font-bold text-sm sm:text-base md:text-lg flex items-center gap-2 md:gap-3 group">
+                        <Image
+                            src="/logo.svg"
+                            alt="Logo BEM Pesantren Indonesia"
+                            width={40}
+                            height={40}
+                            className="rounded-lg transition-opacity group-hover:opacity-80 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 shrink-0"
+                            priority
+                        />
+                        <span className="tracking-tight group-hover:opacity-80 transition-opacity max-w-[120px] sm:max-w-[180px] md:max-w-none truncate leading-tight">
+                            BEM Pesantren Indonesia
+                        </span>
+                    </Link>
 
-                    <div className="hidden md:block">
-                        <div className="flex items-center space-x-8">
+                    {/* Desktop Nav */}
+                    <div className="hidden md:flex items-center gap-6">
+                        <div className="flex items-center space-x-5">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`text-sm font-medium tracking-wide hover:text-secondary transition-colors uppercase ${scrolled ? "text-primary" : "text-white/90 hover:text-white"}`}
+                                    className="text-xs font-bold tracking-wide hover:text-muted-foreground transition-colors uppercase"
                                 >
                                     {item.name}
                                 </Link>
                             ))}
                         </div>
+                        {/* Wrapper for ModeToggle to prevent layout shift */}
+                        <div className="w-9 h-9">
+                            {mounted && <ModeToggle />}
+                        </div>
                     </div>
 
-                    <div className="md:hidden">
-                        <button
-                            onClick={() => setIsOpen(!isOpen)}
-                            className={`p-2 rounded-md focus:outline-none ${scrolled ? "text-primary hover:bg-gray-100" : "text-white hover:bg-white/10"}`}
-                        >
-                            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
+                    {/* Mobile Nav */}
+                    <div className="md:hidden flex items-center gap-1">
+                        <div className="w-9 h-9">
+                            {mounted && <ModeToggle />}
+                        </div>
+                        <div className="w-9 h-9 flex items-center justify-center">
+                            {mounted ? (
+                                <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                                    <SheetTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-9 w-9 focus:outline-none">
+                                            <Menu className="h-5 w-5" />
+                                        </Button>
+                                    </SheetTrigger>
+                                    <SheetContent side="right" className="w-[280px] sm:w-[340px]">
+                                        <SheetHeader>
+                                            <SheetTitle className="text-left font-serif font-bold text-lg mb-4">
+                                                Menu Navigasi
+                                            </SheetTitle>
+                                        </SheetHeader>
+                                        <div className="flex flex-col space-y-1 mt-2">
+                                            {navItems.map((item) => (
+                                                <Link
+                                                    key={item.name}
+                                                    href={item.href}
+                                                    className="block px-4 py-3 rounded-lg hover:bg-muted text-sm font-medium transition-colors"
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+                            ) : (
+                                <Button variant="ghost" size="icon" className="h-9 w-9">
+                                    <Menu className="h-5 w-5" />
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Menu */}
-            {isOpen && (
-                <div className="md:hidden bg-background border-t">
-                    <div className="px-4 pt-4 pb-6 space-y-2">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.name}
-                                href={item.href}
-                                className="block px-4 py-3 rounded-lg hover:bg-muted text-base font-medium text-foreground"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
         </nav>
     )
 }

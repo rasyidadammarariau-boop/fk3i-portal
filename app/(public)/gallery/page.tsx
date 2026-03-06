@@ -1,111 +1,165 @@
-import prisma from "@/lib/prisma"
+﻿import prisma from "@/lib/prisma"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Metadata } from 'next'
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { MapPin, Calendar, Images } from "lucide-react"
 
 export const metadata: Metadata = {
-    title: 'Galeri Dokumentasi',
-    description: 'Kumpulan dokumentasi foto kegiatan Kyai Kampung di berbagai daerah.',
+    title: 'Arsip Pergerakan',
+    description: 'Dokumentasi jejak pergerakan, aksi, audiensi, dan konsolidasi BEM Pesantren Indonesia di berbagai daerah.',
 }
 
-async function getGallery() {
+
+const FILTER_TABS: [string, string][] = [
+    ["", "Semua Arsip"],
+    ["aksi", "Aksi"],
+    ["audiensi", "Audiensi"],
+    ["silatnas", "Silatnas"],
+    ["kajian", "Kajian"],
+    ["pengabdian", "Pengabdian"],
+    ["kegiatan", "Kegiatan Umum"],
+]
+
+async function getAlbums(type?: string) {
     try {
-        const [albums, standaloneImages] = await Promise.all([
-            prisma.galleryAlbum.findMany({
-                where: { published: true },
-                orderBy: { createdAt: 'desc' }
-            }),
-            prisma.galleryImage.findMany({
-                where: {
-                    published: true,
-                    albumId: null
-                },
-                orderBy: { createdAt: 'desc' }
-            })
-        ])
-
-        // Combine and format
-        const galleryItems = [
-            ...albums.map(album => ({
-                id: album.id,
-                title: album.title,
-                description: album.description,
-                image: album.cover,
-                type: 'album' as const,
-                slug: album.slug,
-                createdAt: album.createdAt
-            })),
-            ...standaloneImages.map(img => ({
-                id: img.id,
-                title: img.title || 'Foto',
-                description: img.description,
-                image: img.url,
-                type: 'image' as const,
-                slug: img.id,
-                createdAt: img.createdAt
-            }))
-        ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
-        return galleryItems
-    } catch (e) {
+        return await prisma.galleryAlbum.findMany({
+            where: {
+                published: true,
+                ...(type ? { activityType: type } : {}),
+            },
+            orderBy: { eventDate: 'desc' },
+            include: {
+                _count: { select: { images: true } }
+            }
+        })
+    } catch {
         return []
     }
 }
 
-export default async function GalleryPage() {
-    const gallery = await getGallery()
+export default async function GalleryPage({
+    searchParams,
+}: {
+    searchParams?: Promise<{ type?: string }>
+}) {
+    const params = await searchParams
+    const typeFilter = params?.type || ""
+
+    const albums = await getAlbums(typeFilter)
 
     return (
-        <div className="bg-[#fcfcfc] min-h-screen pb-24">
+        <div className="bg-background min-h-screen pb-24">
             {/* Header */}
-            <div className="bg-primary pt-32 pb-24 text-center text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')]"></div>
-                <div className="container mx-auto px-6 relative z-10">
-                    <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-4 block">Dokumentasi</span>
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-4">Galeri Kegiatan</h1>
-                    <p className="text-xl opacity-80 max-w-2xl mx-auto font-light">Merekam jejak langkah perjuangan dan kebersamaan.</p>
+            <div className="bg-background border-b border-border pt-24 pb-12 md:pt-32 md:pb-16 text-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <div className="container mx-auto px-6 relative z-10 flex flex-col items-center">
+                    <Badge variant="outline" className="font-bold tracking-widest uppercase text-xs md:text-sm mb-3 md:mb-4 block max-w-max mx-auto">
+                        Dokumentasi Pergerakan
+                    </Badge>
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-3 md:mb-4">Arsip Pergerakan</h1>
+                    <p className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-light text-muted-foreground">
+                        Rekam jejak aksi, audiensi, konsolidasi, dan pengabdian mahasiswa santri Indonesia.
+                    </p>
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 -mt-16 relative z-20">
-                <div className="bg-white p-6 rounded-2xl shadow-xl min-h-[60vh]">
-                    {gallery.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {gallery.map((item, index) => (
-                                <Link
-                                    href={item.type === 'album' ? `/gallery/${item.slug}` : `/gallery/photo/${item.slug}`}
-                                    key={item.id}
-                                    className="group break-inside-avoid relative mb-6 rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer hover:-translate-y-2 block"
-                                >
-                                    <div className="relative aspect-[4/3] w-full">
-                                        {item.image ? (
-                                            <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
-                                        ) : (
-                                            <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary/30 font-serif text-4xl">FK3i</div>
-                                        )}
-                                        {/* Type Badge */}
-                                        <div className="absolute top-3 right-3 bg-secondary/90 backdrop-blur-sm text-primary text-xs font-bold uppercase px-3 py-1 rounded-full">
-                                            {item.type === 'album' ? 'Album' : 'Foto'}
-                                        </div>
-                                        <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 text-center">
-                                            <h3 className="text-white font-serif text-xl font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{item.title}</h3>
-                                            {item.description && (
-                                                <p className="text-white/80 text-sm font-sans translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-100 line-clamp-3">
-                                                    {item.description}
-                                                </p>
+            {/* Filter Tabs */}
+            <div className="container mx-auto px-6 mt-8 flex flex-wrap gap-2 justify-center">
+                {FILTER_TABS.map(([val, label]) => (
+                    <Link
+                        key={val}
+                        href={val ? `/gallery?type=${val}` : "/gallery"}
+                        className={`text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full border transition-colors ${typeFilter === val
+                            ? "bg-foreground text-background border-foreground"
+                            : "border-border hover:border-foreground/30"
+                            }`}
+                    >
+                        {label}
+                    </Link>
+                ))}
+            </div>
+
+            {/* Gallery Grid */}
+            <div className="container mx-auto px-4 md:px-6 mt-12">
+                {albums.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                        {albums.map((album: Awaited<ReturnType<typeof getAlbums>>[0]) => {
+                            return (
+                                <Link key={album.id} href={`/gallery/${album.slug}`} className="group outline-none">
+                                    <Card className="rounded-xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-500 border-border/50">
+                                        {/* Cover Image */}
+                                        <div className="relative aspect-[16/10] w-full bg-muted overflow-hidden">
+                                            {album.cover ? (
+                                                <Image
+                                                    src={album.cover}
+                                                    alt={album.title}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary/30 font-serif text-3xl">
+                                                    BEM Pesantren
+                                                </div>
+                                            )}
+                                            {/* Overlay on hover */}
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                            {/* Activity Type Badge */}
+                                            {album.activityType && (
+                                                <div className="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full bg-background/80 text-foreground backdrop-blur border border-border/50 capitalize">
+                                                    {album.activityType}
+                                                </div>
+                                            )}
+
+                                            {/* Photo Count */}
+                                            {album._count.images > 0 && (
+                                                <div className="absolute top-3 right-3 flex items-center gap-1 bg-black/60 text-white text-xs font-bold px-2 py-1 rounded-full backdrop-blur">
+                                                    <Images className="w-3 h-3" />
+                                                    {album._count.images}
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
+
+                                        <CardContent className="p-5">
+                                            {/* Date & Location */}
+                                            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-2.5">
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {new Date(album.eventDate).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                                                </span>
+                                                {album.location && (
+                                                    <span className="flex items-center gap-1 text-primary font-semibold">
+                                                        <MapPin className="w-3.5 h-3.5" />
+                                                        {album.location}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h3 className="font-serif font-bold text-base md:text-lg leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                                                {album.title}
+                                            </h3>
+                                            {album.description && (
+                                                <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2 leading-relaxed">{album.description}</p>
+                                            )}
+                                        </CardContent>
+                                    </Card>
                                 </Link>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center h-64 text-muted-foreground">
-                            <p>Belum ada dokumentasi kegiatan.</p>
-                        </div>
-                    )}
-                </div>
+                            )
+                        })}
+                    </div>
+                ) : (
+                    <div className="text-center py-20">
+                        <p className="text-muted-foreground text-lg">
+                            {typeFilter
+                                ? `Belum ada arsip untuk jenis kegiatan "${typeFilter}".`
+                                : "Belum ada arsip pergerakan yang terdokumentasi."}
+                        </p>
+                        <Link href="/gallery" className="text-primary text-sm font-bold mt-3 inline-block hover:underline">
+                            ← Lihat semua arsip
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     )

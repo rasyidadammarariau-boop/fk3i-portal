@@ -5,6 +5,9 @@ import { z } from "zod"
 import { revalidatePath } from "next/cache"
 
 const profileSchema = z.object({
+    name: z.string().optional(),
+    tagline: z.string().optional(),
+    logoUrl: z.string().url().optional().or(z.literal('')),
     email: z.string().email().optional().or(z.literal('')),
     emailSecondary: z.string().email().optional().or(z.literal('')),
     phone: z.string().optional(),
@@ -26,7 +29,7 @@ const profileSchema = z.object({
     history: z.string().optional(),
 })
 
-export async function updateOrganizationProfile(prevState: any, formData: FormData) {
+export async function updateOrganizationProfile(prevState: unknown, formData: FormData) {
     const rawData = Object.fromEntries(formData.entries())
 
     const validated = profileSchema.safeParse(rawData)
@@ -52,3 +55,4 @@ export async function updateOrganizationProfile(prevState: any, formData: FormDa
         return { error: 'Gagal memperbarui profil. Silakan coba lagi.' }
     }
 }
+

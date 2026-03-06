@@ -30,8 +30,8 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Edit Berita</h1>
-                    <p className="text-muted-foreground">Perbarui konten artikel, gambar, dan metadata.</p>
+                    <h1 className="text-2xl font-bold tracking-tight  dark:text-gray-100">Edit Berita</h1>
+                    <p className="">Perbarui konten artikel, gambar, dan metadata.</p>
                 </div>
             </div>
 

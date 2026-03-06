@@ -8,7 +8,7 @@ const categorySchema = z.object({
     name: z.string().min(2, "Nama kategori minimal 2 karakter"),
 })
 
-export async function createCategory(prevState: any, formData: FormData) {
+export async function createCategory(prevState: unknown, formData: FormData) {
     const rawData = {
         name: formData.get('name'),
     }
@@ -47,7 +47,7 @@ export async function createCategory(prevState: any, formData: FormData) {
     }
 }
 
-export async function updateCategory(id: string, prevState: any, formData: FormData) {
+export async function updateCategory(id: string, prevState: unknown, formData: FormData) {
     const rawData = {
         name: formData.get('name'),
     }
@@ -111,3 +111,4 @@ export async function deleteCategory(id: string) {
         return { success: false, error: 'Gagal menghapus kategori' }
     }
 }
+

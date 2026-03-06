@@ -56,3 +56,4 @@ export function Pagination({ totalPages }: { totalPages: number }) {
         </div>
     )
 }
+

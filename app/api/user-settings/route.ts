@@ -37,7 +37,7 @@ export async function GET() {
             language: settings.language,
             itemsPerPage: settings.itemsPerPage
         })
-    } catch (error) {
+    } catch {
         console.error('Error fetching user settings:', error)
         return NextResponse.json({
             darkMode: false,
@@ -48,3 +48,4 @@ export async function GET() {
         })
     }
 }
+

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, LogOut, User, Settings } from "lucide-react"
+import { LogOut, User, Settings, Search } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,6 +16,10 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Input } from "@/components/ui/input"
+import { ModeToggle } from "@/components/toggle-theme"
+import { SidebarTrigger } from "@/components/ui/sidebar"
+import { NotificationMenu } from "./notification-menu"
 
 export function AdminHeader() {
     const { data: session } = useSession()
@@ -28,7 +32,7 @@ export function AdminHeader() {
             await signOut({ redirect: false })
             toast.success("Berhasil keluar")
             router.push("/login")
-        } catch (error) {
+        } catch {
             toast.error("Gagal keluar, silakan coba lagi")
             setIsLoggingOut(false)
         }
@@ -44,33 +48,51 @@ export function AdminHeader() {
         .slice(0, 2)
 
     return (
-        <header className="h-16 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between px-6 sticky top-0 z-10">
-            <div>
-                <h2 className="font-bold text-gray-700 dark:text-gray-200">Selamat Datang, {userName.split(" ")[0]}</h2>
-                <p className="text-xs text-muted-foreground">{userEmail}</p>
+        <header className="h-16 border-b border-border bg-background flex items-center justify-between px-6 sticky top-0 z-10">
+            <div className="flex items-center gap-4">
+                <SidebarTrigger className="-ml-2" />
+                <div>
+                    <h2 className="font-bold  dark:text-gray-200 hidden md:block">Selamat Datang, {userName.split(" ")[0]}</h2>
+                    <p className="text-xs  hidden md:block">{userEmail}</p>
+                </div>
             </div>
 
+            {/* Global Search */}
+            <form
+                action="/admin/search"
+                method="GET"
+                className="hidden md:flex items-center gap-2 flex-1 max-w-xs mx-6"
+            >
+                <div className="relative w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 " />
+                    <Input
+                        name="q"
+                        placeholder="Cari konten..."
+                        className="pl-9 h-8 text-sm bg-muted"
+                    />
+                </div>
+            </form>
+
             <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" className="text-gray-500 dark:text-gray-400 relative">
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </Button>
+                <ModeToggle />
+
+                <NotificationMenu />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 py-1 h-auto hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
+                        <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 py-1 h-auto hover:bg-accent rounded-full">
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${userName}`} alt={userName} />
                                 <AvatarFallback>{initials}</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{userName}</span>
+                            <span className="text-sm font-medium  dark:text-gray-200">{userName}</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
                         <DropdownMenuLabel>
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none">{userName}</p>
-                                <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
+                                <p className="text-xs leading-none ">{userEmail}</p>
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
@@ -88,7 +110,7 @@ export function AdminHeader() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20"
+                            className="text-destructive focus:text-destructive focus:bg-destructive/10 dark:focus:bg-destructive/10"
                             onClick={handleLogout}
                             disabled={isLoggingOut}
                         >
@@ -98,6 +120,7 @@ export function AdminHeader() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-        </header>
+        </header >
     )
 }
+

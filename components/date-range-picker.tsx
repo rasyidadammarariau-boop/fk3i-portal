@@ -31,7 +31,7 @@ export function CalendarDateRangePicker({
                         variant={"outline"}
                         className={cn(
                             "w-[260px] justify-start text-left font-normal dark:bg-gray-800 dark:text-white dark:border-gray-700",
-                            !date && "text-muted-foreground"
+                            !date && ""
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -63,3 +63,4 @@ export function CalendarDateRangePicker({
         </div>
     )
 }
+

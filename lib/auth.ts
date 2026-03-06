@@ -2,8 +2,6 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { compare } from "bcryptjs"
 import prisma from "@/lib/prisma"
-import type { User } from "@prisma/client"
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
         Credentials({
@@ -63,16 +61,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.id = user.id
                 token.email = user.email
                 token.name = user.name
-                token.role = (user as any).role
+                token.role = user.role
             }
             return token
         },
         async session({ session, token }) {
             if (token && session.user) {
                 session.user.id = token.id as string
-                session.user.email = token.email as string
-                session.user.name = token.name as string
-                (session.user as any).role = token.role
+                session.user.email = (token.email ?? "") as string
+                session.user.name = (token.name ?? "") as string
+                session.user.role = (token.role ?? "admin") as string
             }
             return session
         }

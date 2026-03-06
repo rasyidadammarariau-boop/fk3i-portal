@@ -10,7 +10,7 @@ async function getWhatsAppNumber() {
             select: { whatsapp: true }
         })
         return profile?.whatsapp || null
-    } catch (e) {
+    } catch {
         return null
     }
 }
@@ -31,3 +31,4 @@ export default async function PublicLayout({
         </div>
     );
 }
+

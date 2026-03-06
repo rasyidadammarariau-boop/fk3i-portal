@@ -5,11 +5,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, ArrowLeft, Image as ImageIcon, CheckCircle2, Circle } from "lucide-react"
+import { CalendarIcon, ArrowLeft, CheckCircle2, Circle, MapPin } from "lucide-react"
 import Link from "next/link"
 import { updateGalleryAlbum } from "@/app/admin/gallery/actions"
 import { useActionState, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { ImageUpload } from "@/components/admin/image-upload"
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from "@/components/ui/select"
 import {
     Popover,
     PopoverContent,
@@ -40,15 +44,16 @@ import { Trash2, Plus, Loader2, Save } from "lucide-react"
 import { deleteGalleryImage, deleteGalleryImages, uploadAlbumPhotos } from "@/app/admin/gallery/actions"
 import Image from "next/image"
 
-export default function EditAlbumForm({ album }: { album: any }) {
+export default function EditAlbumForm({ album }: { album: { id: string, title: string, eventDate: Date, description: string | null, cover: string | null, activityType: string, location: string | null, images: Array<{ id: string, url: string }> } }) {
     const updateAlbumWithId = updateGalleryAlbum.bind(null, album.id)
     const [state, formAction, isPending] = useActionState(updateAlbumWithId, initialState)
     const [date, setDate] = useState<Date>(new Date(album.eventDate))
-    const [imagePreview, setImagePreview] = useState(album.cover || "")
+    const [_imagePreview, _setImagePreview] = useState(album.cover || "")
     const [isUploading, setIsUploading] = useState(false)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const [photoToDelete, setPhotoToDelete] = useState<string | null>(null)
     const [showBulkDeleteAlert, setShowBulkDeleteAlert] = useState(false)
+    const [activityType, setActivityType] = useState(album.activityType || 'kegiatan')
 
     const router = useRouter()
 
@@ -66,7 +71,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
             toast.success("Foto dihapus")
             setPhotoToDelete(null)
             router.refresh()
-        } catch (error) {
+        } catch {
             toast.error("Gagal menghapus foto")
         }
     }
@@ -80,7 +85,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
             setSelectedIds([])
             setShowBulkDeleteAlert(false)
             router.refresh()
-        } catch (error) {
+        } catch {
             toast.error("Gagal menghapus foto terpilih")
         }
     }
@@ -97,7 +102,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
         if (selectedIds.length === album.images.length) {
             setSelectedIds([])
         } else {
-            setSelectedIds(album.images.map((img: any) => img.id))
+            setSelectedIds(album.images.map((img: { id: string }) => img.id))
         }
     }
 
@@ -118,7 +123,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
             } else {
                 toast.error(result.error)
             }
-        } catch (error) {
+        } catch {
             toast.error("Gagal mengupload foto")
         } finally {
             setIsUploading(false)
@@ -136,7 +141,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold">Edit Album</h1>
-                    <p className="text-muted-foreground">Ubah informasi detail album ini.</p>
+                    <p className="">Ubah informasi detail album ini.</p>
                 </div>
             </div>
 
@@ -155,6 +160,33 @@ export default function EditAlbumForm({ album }: { album: any }) {
                                     <Input id="title" name="title" defaultValue={album.title} required />
                                 </div>
 
+                                {/* Jenis Kegiatan */}
+                                <div className="space-y-2">
+                                    <Label>Jenis Kegiatan</Label>
+                                    <input type="hidden" name="activityType" value={activityType} />
+                                    <Select value={activityType} onValueChange={setActivityType}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih jenis kegiatan..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="aksi"> Aksi / Demonstrasi</SelectItem>
+                                            <SelectItem value="audiensi"> Audiensi / Advokasi</SelectItem>
+                                            <SelectItem value="silatnas"> Silatnas / Konsolidasi</SelectItem>
+                                            <SelectItem value="kajian"> Kajian / Diskusi Publik</SelectItem>
+                                            <SelectItem value="pengabdian"> Pengabdian Masyarakat</SelectItem>
+                                            <SelectItem value="kegiatan"> Kegiatan Umum</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Lokasi */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="location" className="flex items-center gap-1">
+                                        <MapPin className="w-3.5 h-3.5" /> Lokasi
+                                    </Label>
+                                    <Input id="location" name="location" defaultValue={album.location || ''} placeholder="Kota, Gedung, atau Instansi Tujuan" />
+                                </div>
+
                                 <div className="space-y-2 flex flex-col">
                                     <Label>Tanggal Kegiatan</Label>
                                     <input type="hidden" name="eventDate" value={date.toISOString()} />
@@ -164,7 +196,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
                                                 variant={"outline"}
                                                 className={cn(
                                                     "w-full justify-start text-left font-normal",
-                                                    !date && "text-muted-foreground"
+                                                    !date && ""
                                                 )}
                                             >
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -187,35 +219,13 @@ export default function EditAlbumForm({ album }: { album: any }) {
                                     <Textarea id="description" name="description" defaultValue={album.description || ""} />
                                 </div>
 
-                                <div className="space-y-4">
+                                <div className="space-y-2">
                                     <Label>Cover Album</Label>
-                                    <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition cursor-pointer relative bg-gray-50/50">
-                                        <Input
-                                            name="cover"
-                                            type="file"
-                                            accept="image/*"
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0]
-                                                if (file) setImagePreview(URL.createObjectURL(file))
-                                            }}
-                                        />
-                                        {imagePreview ? (
-                                            <div className="relative">
-                                                <img src={imagePreview} className="max-h-48 rounded shadow-sm object-contain" alt="Preview" />
-                                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded text-white text-sm font-medium">
-                                                    Ganti Cover
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="p-3 bg-muted rounded-full mb-3">
-                                                    <ImageIcon className="w-6 h-6 text-muted-foreground" />
-                                                </div>
-                                                <p className="text-sm font-medium">Upload cover baru</p>
-                                            </>
-                                        )}
-                                    </div>
+                                    <ImageUpload
+                                        name="cover"
+                                        defaultValue={album.cover}
+                                        label="Cover Album"
+                                    />
                                 </div>
 
                                 <div className="pt-4 border-t flex flex-col sm:flex-row justify-end gap-3">
@@ -278,7 +288,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
                                 </div>
                             </div>
                             {album.images && album.images.length > 0 && (
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-2 text-sm ">
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -295,7 +305,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
                         <CardContent>
                             <div className="grid grid-cols-2 gap-3 max-h-[600px] overflow-y-auto pr-2">
                                 {album.images && album.images.length > 0 ? (
-                                    album.images.map((img: any) => {
+                                    album.images.map((img: { id: string, url: string }) => {
                                         const isSelected = selectedIds.includes(img.id)
                                         return (
                                             <div
@@ -340,7 +350,7 @@ export default function EditAlbumForm({ album }: { album: any }) {
                                         )
                                     })
                                 ) : (
-                                    <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
+                                    <p className="col-span-2 text-center text-sm  py-8">
                                         Belum ada foto.
                                     </p>
                                 )}
@@ -397,3 +407,4 @@ export default function EditAlbumForm({ album }: { album: any }) {
         </div>
     )
 }
+

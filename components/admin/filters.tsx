@@ -21,7 +21,7 @@ export function StatusFilter() {
 
     return (
         <Select defaultValue={searchParams.get('status') || 'all'} onValueChange={handleValueChange}>
-            <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800 dark:border-gray-600">
+            <SelectTrigger className="w-[180px]  dark:border-gray-600">
                 <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -54,7 +54,7 @@ export function CategoryFilter() {
 
     return (
         <Select defaultValue={searchParams.get('category') || 'all'} onValueChange={handleValueChange}>
-            <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800 dark:border-gray-600">
+            <SelectTrigger className="w-[180px]  dark:border-gray-600">
                 <SelectValue placeholder="Kategori" />
             </SelectTrigger>
             <SelectContent>
@@ -66,3 +66,4 @@ export function CategoryFilter() {
         </Select>
     )
 }
+

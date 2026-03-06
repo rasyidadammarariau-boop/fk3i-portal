@@ -3,12 +3,14 @@
 import { Search } from "lucide-react"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
 
 // Simple debounce utility
-function useDebounce(callback: (...args: any[]) => void, delay: number) {
+function useDebounce<Args extends unknown[]>(callback: (...args: Args) => void, delay: number) {
     const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 
-    return useCallback((...args: any[]) => {
+    return useCallback((...args: Args) => {
         if (timer) clearTimeout(timer);
         const newTimer = setTimeout(() => {
             callback(...args);
@@ -34,15 +36,18 @@ export function NewsSearch() {
     }, 300)
 
     return (
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 max-w-3xl mx-auto flex gap-4 items-center">
-            <Search className="text-muted-foreground w-5 h-5 ml-2" />
-            <input
-                type="text"
-                placeholder="Cari berita..."
-                className="flex-1 outline-none text-foreground placeholder:text-muted-foreground bg-transparent"
-                onChange={(e) => handleSearch(e.target.value)}
-                defaultValue={searchParams.get('q')?.toString()}
-            />
-        </div>
+        <Card className="rounded-xl shadow-lg border-gray-100 max-w-3xl mx-auto overflow-hidden">
+            <CardContent className="p-2 flex gap-2 items-center">
+                <Search className=" w-5 h-5 ml-2" />
+                <Input
+                    type="text"
+                    placeholder="Cari berita..."
+                    className="flex-1 border-none shadow-none focus-visible:ring-0 px-2"
+                    onChange={(e) => handleSearch(e.target.value)}
+                    defaultValue={searchParams.get('q')?.toString()}
+                />
+            </CardContent>
+        </Card>
     )
 }
+

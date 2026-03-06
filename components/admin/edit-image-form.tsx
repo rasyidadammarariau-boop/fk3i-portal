@@ -11,18 +11,16 @@ import { updateGalleryImage } from "@/app/admin/gallery/actions"
 import { useActionState, useEffect, useState } from "react"
 import { toast } from "sonner"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 
 const initialState = {
     error: '',
     success: false
 }
 
-export default function EditImageForm({ image }: { image: any }) {
+export default function EditImageForm({ image }: { image: { id: string, title?: string | null, url: string } }) {
     const updateImageWithId = updateGalleryImage.bind(null, image.id)
     const [state, formAction, isPending] = useActionState(updateImageWithId, initialState)
     const [imagePreview, setImagePreview] = useState(image.url || "")
-    const router = useRouter()
 
     useEffect(() => {
         if (state?.error) {
@@ -40,7 +38,7 @@ export default function EditImageForm({ image }: { image: any }) {
                 </Link>
                 <div>
                     <h1 className="text-2xl font-bold">Edit Foto</h1>
-                    <p className="text-muted-foreground">Ubah informasi atau status foto.</p>
+                    <p className="">Ubah informasi atau status foto.</p>
                 </div>
             </div>
 
@@ -86,14 +84,14 @@ export default function EditImageForm({ image }: { image: any }) {
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-full mb-3">
-                                                <UploadCloud className="w-8 h-8 text-blue-500" />
+                                            <div className="p-3 bg-muted rounded-full mb-3">
+                                                <UploadCloud className="w-8 h-8 " />
                                             </div>
                                             <p className="text-sm font-medium">Klik untuk ganti foto</p>
                                         </>
                                     )}
                                 </div>
-                                <p className="text-xs text-muted-foreground">Biarkan kosong jika tidak ingin mengubah foto.</p>
+                                <p className="text-xs ">Biarkan kosong jika tidak ingin mengubah foto.</p>
                             </div>
 
                             <div className="pt-4 border-t flex flex-col sm:flex-row justify-end gap-3">
@@ -131,3 +129,4 @@ export default function EditImageForm({ image }: { image: any }) {
         </form>
     )
 }
+

@@ -1,8 +1,10 @@
-'use client'
+﻿'use client'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
 import { updateOrganizationProfile } from "@/app/admin/organization/actions"
@@ -19,7 +21,7 @@ function SubmitButton() {
 }
 
 interface OrganizationProfileFormProps {
-    profile: any
+    profile: { name?: string | null, tagline?: string | null, logoUrl?: string | null, email?: string | null, emailSecondary?: string | null, phone?: string | null, phoneSecondary?: string | null, whatsapp?: string | null, whatsappSecondary?: string | null, address?: string | null, city?: string | null, province?: string | null, postalCode?: string | null, facebook?: string | null, instagram?: string | null, twitter?: string | null, youtube?: string | null, shortDescription?: string | null, longDescription?: string | null, vision?: string | null, mission?: string | null, history?: string | null } | null
 }
 
 export function OrganizationProfileForm({ profile }: OrganizationProfileFormProps) {
@@ -36,12 +38,53 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
     return (
         <form action={formAction}>
             <Tabs defaultValue="contact" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
+                    <TabsTrigger value="identity">Identitas</TabsTrigger>
                     <TabsTrigger value="contact">Kontak</TabsTrigger>
                     <TabsTrigger value="address">Alamat</TabsTrigger>
                     <TabsTrigger value="social">Sosial Media</TabsTrigger>
                     <TabsTrigger value="about">Tentang</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="identity">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Identitas Organisasi</CardTitle>
+                            <CardDescription>Nama resmi, tagline, dan logo organisasi</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Nama Organisasi</label>
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    defaultValue={profile?.name || ''}
+                                    placeholder="BEM Pesantren Indonesia"
+                                />
+                                <p className="text-xs text-muted-foreground">Nama ini akan ditampilkan di seluruh halaman website.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Tagline / Slogan</label>
+                                <Input
+                                    type="text"
+                                    name="tagline"
+                                    defaultValue={profile?.tagline || ''}
+                                    placeholder="Santri Bergerak, Indonesia Maju"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">URL Logo</label>
+                                <Input
+                                    type="url"
+                                    name="logoUrl"
+                                    defaultValue={profile?.logoUrl || ''}
+                                    placeholder="https://bem-pesantren.or.id/logo.png"
+                                />
+                                <p className="text-xs text-muted-foreground">Masukkan URL gambar logo. Untuk mengupload, gunakan menu Galeri terlebih dahulu lalu copy link-nya.</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
 
                 <TabsContent value="contact">
                     <Card>
@@ -53,22 +96,20 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Email Utama</label>
-                                    <input
+                                    <Input
                                         type="email"
                                         name="email"
                                         defaultValue={profile?.email || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                        placeholder="sekretariat@fk3i.or.id"
+                                        placeholder="sekretariat@bem-pesantren.or.id"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Email Kedua</label>
-                                    <input
+                                    <Input
                                         type="email"
                                         name="emailSecondary"
                                         defaultValue={profile?.emailSecondary || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
-                                        placeholder="humas@fk3i.or.id"
+                                        placeholder="humas@bem-pesantren.or.id"
                                     />
                                 </div>
                             </div>
@@ -76,21 +117,19 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Telepon Utama</label>
-                                    <input
+                                    <Input
                                         type="tel"
                                         name="phone"
                                         defaultValue={profile?.phone || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="+62 21 1234 5678"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Telepon Kedua</label>
-                                    <input
+                                    <Input
                                         type="tel"
                                         name="phoneSecondary"
                                         defaultValue={profile?.phoneSecondary || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                     />
                                 </div>
                             </div>
@@ -98,21 +137,19 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                             <div className="grid md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">WhatsApp Utama (format: 6281234567890)</label>
-                                    <input
+                                    <Input
                                         type="text"
                                         name="whatsapp"
                                         defaultValue={profile?.whatsapp || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="6281234567890"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">WhatsApp Kedua</label>
-                                    <input
+                                    <Input
                                         type="text"
                                         name="whatsappSecondary"
                                         defaultValue={profile?.whatsappSecondary || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="6285678901234"
                                     />
                                 </div>
@@ -130,11 +167,10 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Alamat Lengkap</label>
-                                <textarea
+                                <Textarea
                                     name="address"
                                     defaultValue={profile?.address || ''}
                                     rows={3}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="Jl. Kramat Raya No. 164"
                                 />
                             </div>
@@ -142,31 +178,28 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                             <div className="grid md:grid-cols-3 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Kota/Kabupaten</label>
-                                    <input
+                                    <Input
                                         type="text"
                                         name="city"
                                         defaultValue={profile?.city || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="Jakarta Pusat"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Provinsi</label>
-                                    <input
+                                    <Input
                                         type="text"
                                         name="province"
                                         defaultValue={profile?.province || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="DKI Jakarta"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Kode Pos</label>
-                                    <input
+                                    <Input
                                         type="text"
                                         name="postalCode"
                                         defaultValue={profile?.postalCode || ''}
-                                        className="w-full px-3 py-2 border rounded-md"
                                         placeholder="10430"
                                     />
                                 </div>
@@ -184,42 +217,38 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Facebook</label>
-                                <input
+                                <Input
                                     type="url"
                                     name="facebook"
                                     defaultValue={profile?.facebook || ''}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    placeholder="https://facebook.com/fk3i"
+                                    placeholder="https://facebook.com/bempesantren"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Instagram</label>
-                                <input
+                                <Input
                                     type="url"
                                     name="instagram"
                                     defaultValue={profile?.instagram || ''}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    placeholder="https://instagram.com/fk3i"
+                                    placeholder="https://instagram.com/bempesantren"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Twitter / X</label>
-                                <input
+                                <Input
                                     type="url"
                                     name="twitter"
                                     defaultValue={profile?.twitter || ''}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    placeholder="https://twitter.com/fk3i"
+                                    placeholder="https://twitter.com/bempesantren"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">YouTube</label>
-                                <input
+                                <Input
                                     type="url"
                                     name="youtube"
                                     defaultValue={profile?.youtube || ''}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                    placeholder="https://youtube.com/@fk3i"
+                                    placeholder="https://youtube.com/@bempesantren"
                                 />
                             </div>
                         </CardContent>
@@ -235,51 +264,46 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Deskripsi Singkat</label>
-                                <textarea
+                                <Textarea
                                     name="shortDescription"
                                     defaultValue={profile?.shortDescription || ''}
                                     rows={2}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="Deskripsi singkat untuk hero section"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Deskripsi Lengkap</label>
-                                <textarea
+                                <Textarea
                                     name="longDescription"
                                     defaultValue={profile?.longDescription || ''}
                                     rows={4}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="Deskripsi lengkap organisasi"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Visi</label>
-                                <textarea
+                                <Textarea
                                     name="vision"
                                     defaultValue={profile?.vision || ''}
                                     rows={3}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="Visi organisasi"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Misi (pisahkan dengan enter untuk numbered list)</label>
-                                <textarea
+                                <Textarea
                                     name="mission"
                                     defaultValue={profile?.mission || ''}
                                     rows={5}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="1. Misi pertama&#10;2. Misi kedua&#10;3. Misi ketiga"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">Sejarah</label>
-                                <textarea
+                                <Textarea
                                     name="history"
                                     defaultValue={profile?.history || ''}
                                     rows={6}
-                                    className="w-full px-3 py-2 border rounded-md"
                                     placeholder="Sejarah singkat organisasi"
                                 />
                             </div>
@@ -294,3 +318,4 @@ export function OrganizationProfileForm({ profile }: OrganizationProfileFormProp
         </form>
     )
 }
+

@@ -1,29 +1,33 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import * as React from "react"
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+    type ColumnDef,
+    type ColumnFiltersState,
+    type SortingState,
+} from "@tanstack/react-table"
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import {
+    Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Pencil, Trash2, Plus, Search, Tag } from "lucide-react"
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select"
+import { Pencil, Trash2, Plus, Tag, ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 import { DeleteConfirmDialog } from "./delete-dialog"
 import { createCategory, updateCategory, deleteCategory } from "@/app/admin/categories/actions"
 
@@ -31,64 +35,46 @@ interface Category {
     id: string
     name: string
     slug: string
-    _count?: {
-        news: number
-    }
+    _count?: { news: number }
     createdAt: Date
 }
 
-interface CategoriesTableProps {
-    data: Category[]
-}
-
-export function CategoriesTable({ data }: CategoriesTableProps) {
-    const [searchTerm, setSearchTerm] = useState("")
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-    const [formData, setFormData] = useState({ name: "" })
-
+export function CategoriesTable({ data }: { data: Category[] }) {
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 10 })
+    const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(false)
+    const [editingCategory, setEditingCategory] = React.useState<Category | null>(null)
+    const [formName, setFormName] = React.useState("")
     const router = useRouter()
-
-    const filteredData = data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
 
     const handleOpenCreate = () => {
         setEditingCategory(null)
-        setFormData({ name: "" })
+        setFormName("")
         setIsDialogOpen(true)
     }
 
     const handleOpenEdit = (category: Category) => {
         setEditingCategory(category)
-        setFormData({ name: category.name })
+        setFormName(category.name)
         setIsDialogOpen(true)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-
         const form = new FormData()
-        form.append("name", formData.name)
-
-        let result
-        if (editingCategory) {
-            result = await updateCategory(editingCategory.id, null, form)
-        } else {
-            result = await createCategory(null, form)
-        }
-
+        form.append("name", formName)
+        const result = editingCategory
+            ? await updateCategory(editingCategory.id, null, form)
+            : await createCategory(null, form)
         setIsLoading(false)
-
         if (result?.error) {
             toast.error(result.error)
         } else {
             toast.success(result?.message || "Berhasil menyimpan kategori")
             setIsDialogOpen(false)
-            setEditingCategory(null)
-            setFormData({ name: "" })
             router.refresh()
         }
     }
@@ -103,84 +89,114 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
         }
     }
 
-    return (
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
-                <div className="relative w-full sm:w-72">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        type="search"
-                        placeholder="Cari kategori..."
-                        className="pl-9 dark:bg-gray-800"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+    const columns: ColumnDef<Category>[] = [
+        {
+            accessorKey: "name",
+            header: ({ column }) => (
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="h-auto p-0 font-semibold">
+                    Nama Kategori <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4" />
+                    <span className="font-medium">{row.original.name}</span>
+                </div>
+            ),
+        },
+        {
+            accessorKey: "slug",
+            header: "Slug",
+            cell: ({ row }) => <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{row.original.slug}</code>,
+        },
+        {
+            id: "count",
+            header: () => <div className="text-center">Jumlah Berita</div>,
+            cell: ({ row }) => (
+                <div className="text-center">
+                    <Badge variant="secondary">{row.original._count?.news || 0}</Badge>
+                </div>
+            ),
+        },
+        {
+            id: "actions",
+            header: () => <div className="text-right">Aksi</div>,
+            cell: ({ row }) => (
+                <div className="flex justify-end gap-2">
+                    <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleOpenEdit(row.original)}>
+                        <Pencil className="w-4 h-4" />
+                    </Button>
+                    <DeleteConfirmDialog
+                        title="Hapus Kategori?"
+                        description={`Apakah Anda yakin ingin menghapus kategori "${row.original.name}"?`}
+                        onConfirm={() => handleDelete(row.original.id)}
+                        trigger={
+                            <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive">
+                                <Trash2 className="w-4 h-4" />
+                            </Button>
+                        }
                     />
                 </div>
-                <Button onClick={handleOpenCreate} className="w-full sm:w-auto">
+            ),
+        },
+    ]
+
+    const table = useReactTable({
+        data,
+        columns,
+        state: { sorting, columnFilters, pagination },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onPaginationChange: setPagination,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+    })
+
+    return (
+        <div className="space-y-4">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between gap-4">
+                <Input
+                    placeholder="Cari kategori..."
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    className="max-w-xs"
+                />
+                <Button onClick={handleOpenCreate}>
                     <Plus className="w-4 h-4 mr-2" /> Tambah Kategori
                 </Button>
             </div>
 
-            <div className="border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm overflow-hidden">
+            {/* Table */}
+            <div className="border rounded-lg overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-gray-50/50 dark:bg-gray-900/50">
-                        <TableRow>
-                            <TableHead className="w-[50px] text-center">No</TableHead>
-                            <TableHead>Nama Kategori</TableHead>
-                            <TableHead>Slug</TableHead>
-                            <TableHead className="text-center">Jumlah Berita</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
-                        </TableRow>
+                    <TableHeader className="bg-muted/50">
+                        {table.getHeaderGroups().map((hg) => (
+                            <TableRow key={hg.id}>
+                                {hg.headers.map((h) => (
+                                    <TableHead key={h.id}>
+                                        {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
                     </TableHeader>
                     <TableBody>
-                        {filteredData.length > 0 ? (
-                            filteredData.map((item, index) => (
-                                <TableRow key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                                    <TableCell className="text-center text-muted-foreground">
-                                        {index + 1}
-                                    </TableCell>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-2">
-                                            <Tag className="w-4 h-4 text-blue-500" />
-                                            {item.name}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground font-mono text-xs">
-                                        {item.slug}
-                                    </TableCell>
-                                    <TableCell className="text-center">
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary-foreground">
-                                            {item._count?.news || 0}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="icon"
-                                                className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                                                onClick={() => handleOpenEdit(item)}
-                                            >
-                                                <Pencil className="w-4 h-4" />
-                                            </Button>
-
-                                            <DeleteConfirmDialog
-                                                title="Hapus Kategori?"
-                                                description={`Apakah Anda yakin ingin menghapus kategori "${item.name}"? Aksi ini akan gagal jika ada berita yang menggunakan kategori ini.`}
-                                                onConfirm={() => handleDelete(item.id)}
-                                                trigger={
-                                                    <Button variant="outline" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600 transition-colors">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                }
-                                            />
-                                        </div>
-                                    </TableCell>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} className="hover:bg-muted/50 transition-colors">
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
                                     Tidak ada data kategori.
                                 </TableCell>
                             </TableRow>
@@ -189,6 +205,32 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
                 </Table>
             </div>
 
+            {/* Pagination */}
+            <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                    {table.getFilteredRowModel().rows.length} kategori
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-sm">
+                        <span>Per halaman</span>
+                        <Select value={`${table.getState().pagination.pageSize}`} onValueChange={(v) => table.setPageSize(Number(v))}>
+                            <SelectTrigger className="w-16 h-8"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                                {[10, 20, 50].map((s) => <SelectItem key={s} value={`${s}`}>{s}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <span className="text-sm">Hal {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
+                    <div className="flex gap-1">
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}><ChevronsLeft className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}><ChevronLeft className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}><ChevronRight className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}><ChevronsRight className="h-4 w-4" /></Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Dialog create/edit */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -200,13 +242,11 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
                     <form onSubmit={handleSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-right">
-                                    Nama
-                                </Label>
+                                <Label htmlFor="name" className="text-right">Nama</Label>
                                 <Input
                                     id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={formName}
+                                    onChange={(e) => setFormName(e.target.value)}
                                     className="col-span-3"
                                     placeholder="Contoh: Berita Nasional"
                                     required
@@ -216,9 +256,7 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Batal</Button>
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? "Menyimpan..." : "Simpan"}
-                            </Button>
+                            <Button type="submit" disabled={isLoading}>{isLoading ? "Menyimpan..." : "Simpan"}</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>

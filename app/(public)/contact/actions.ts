@@ -12,7 +12,7 @@ const contactSchema = z.object({
     message: z.string().min(10, "Pesan minimal 10 karakter"),
 })
 
-export async function submitContactMessage(prevState: any, formData: FormData) {
+export async function submitContactMessage(prevState: unknown, formData: FormData) {
     const rawData = {
         name: formData.get('name'),
         email: formData.get('email'),
@@ -39,3 +39,4 @@ export async function submitContactMessage(prevState: any, formData: FormData) {
         return { error: 'Gagal mengirim pesan. Silakan coba lagi.' }
     }
 }
+

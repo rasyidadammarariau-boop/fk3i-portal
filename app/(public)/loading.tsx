@@ -2,9 +2,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
     return (
-        <div className="bg-[#fcfcfc] min-h-screen pb-24">
+        <div className="bg-background min-h-screen pb-12 md:pb-24">
             {/* Hero Skeleton */}
-            <div className="h-[80vh] w-full bg-gray-200 animate-pulse relative">
+            <div className="h-[90vh] md:min-h-screen w-full bg-muted/20 animate-pulse relative pt-28 pb-12 md:py-0">
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="container mx-auto px-6">
                         <Skeleton className="h-16 w-3/4 mb-6" />
@@ -14,8 +14,8 @@ export default function Loading() {
             </div>
 
             {/* Stats/Features Skeleton */}
-            <div className="container mx-auto px-6 py-24">
-                <div className="grid md:grid-cols-3 gap-8">
+            <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                     {[1, 2, 3].map((i) => (
                         <Skeleton key={i} className="h-64 w-full rounded-2xl" />
                     ))}
@@ -43,3 +43,4 @@ export default function Loading() {
         </div>
     )
 }
+

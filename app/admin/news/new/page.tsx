@@ -18,8 +18,8 @@ export default async function CreateNewsPage() {
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Buat Berita Baru</h1>
-                    <p className="text-muted-foreground">Isi formulir berikut untuk menerbitkan artikel.</p>
+                    <h1 className="text-2xl font-bold tracking-tight  ">Buat Berita Baru</h1>
+                    <p className="">Isi formulir berikut untuk menerbitkan artikel.</p>
                 </div>
             </div>
 
@@ -27,3 +27,4 @@ export default async function CreateNewsPage() {
         </div>
     )
 }
+

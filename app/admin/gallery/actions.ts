@@ -11,7 +11,7 @@ export async function deleteGalleryAlbum(id: string) {
         })
         revalidatePath('/admin/gallery')
         return { success: true }
-    } catch (error) {
+    } catch {
         return { error: 'Gagal menghapus album' }
     }
 }
@@ -23,7 +23,7 @@ export async function deleteGalleryImage(id: string) {
         })
         revalidatePath('/admin/gallery')
         return { success: true }
-    } catch (error) {
+    } catch {
         return { error: 'Gagal menghapus foto' }
     }
 }
@@ -39,7 +39,7 @@ export async function deleteGalleryImages(ids: string[]) {
         })
         revalidatePath('/admin/gallery')
         return { success: true }
-    } catch (error) {
+    } catch {
         return { error: 'Gagal menghapus foto yang dipilih' }
     }
 }
@@ -55,13 +55,42 @@ export async function deleteGalleryAlbums(ids: string[]) {
         })
         revalidatePath('/admin/gallery')
         return { success: true }
-    } catch (error) {
+    } catch {
         return { error: 'Gagal menghapus album yang dipilih' }
+    }
+}
+
+export async function getAvailableImagesForPicker() {
+    try {
+        // Ambil semua foto individual
+        const images = await prisma.galleryImage.findMany({
+            select: { id: true, url: true, title: true },
+            orderBy: { createdAt: 'desc' }
+        })
+
+        // Ambil juga cover dari album jika ada
+        const albums = await prisma.galleryAlbum.findMany({
+            where: { cover: { not: null } },
+            select: { id: true, cover: true, title: true },
+            orderBy: { createdAt: 'desc' }
+        })
+
+        // Gabungkan
+        const combined = [
+            ...images.map((img: { id: string, url: string, title: string | null }) => ({ id: `img-${img.id}`, url: img.url, title: img.title || 'Foto Galeri' })),
+            ...albums.map((alb: { id: string, cover: string | null, title: string }) => ({ id: `cover-${alb.id}`, url: alb.cover as string, title: `Cover: ${alb.title}` }))
+        ]
+
+        return combined
+    } catch (e) {
+        console.error(e)
+        return []
     }
 }
 
 import { writeFile, mkdir } from "fs/promises"
 import { join } from "path"
+import sharp from "sharp"
 
 async function uploadFile(file: File): Promise<string | null> {
     if (!file || file.size === 0 || file.name === 'undefined') return null
@@ -73,26 +102,48 @@ async function uploadFile(file: File): Promise<string | null> {
     await mkdir(uploadDir, { recursive: true })
 
     const sanitizedFilename = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase()
-    const filename = `${Date.now()}-${sanitizedFilename}`
+    const nameWithoutExt = sanitizedFilename.includes('.') ? sanitizedFilename.substring(0, sanitizedFilename.lastIndexOf('.')) : sanitizedFilename
+    const filename = `${Date.now()}-${nameWithoutExt}.webp`
     const filepath = join(uploadDir, filename)
 
-    await writeFile(filepath, buffer)
-    return `/uploads/gallery/${filename}`
+    try {
+        const webpBuffer = await sharp(buffer).webp({ quality: 80 }).toBuffer()
+        await writeFile(filepath, webpBuffer)
+        return `/uploads/gallery/${filename}`
+    } catch {
+        // Fallback jika bukan image yg valid
+        const fallbackName = `${Date.now()}-${sanitizedFilename}`
+        await writeFile(join(uploadDir, fallbackName), buffer)
+        return `/uploads/gallery/${fallbackName}`
+    }
 }
 
-export async function createAlbum(prevState: any, formData: FormData) {
+export async function createAlbum(prevState: unknown, formData: FormData) {
     const rawData = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
         eventDate: formData.get('eventDate') as string,
         published: formData.get('status') === 'published',
+        activityType: formData.get('activityType') as string || 'kegiatan',
+        location: formData.get('location') as string || '',
     }
 
-    const coverFile = formData.get('cover') as File
-    let coverPath = null
+    // Cover bisa berupa URL string dari ImageUpload component
+    const coverUrl = formData.get('cover') as string
+    let coverPath: string | null = null
 
-    if (coverFile && coverFile.size > 0) {
-        coverPath = await uploadFile(coverFile)
+    if (coverUrl && coverUrl.startsWith('/')) {
+        // URL path lokal dari komponen ImageUpload
+        coverPath = coverUrl
+    } else if (coverUrl && coverUrl.startsWith('http')) {
+        // External URL
+        coverPath = coverUrl
+    } else {
+        // fallback: coba terima raw File (backward-compat)
+        const coverFile = formData.get('cover') as File
+        if (coverFile && coverFile.size > 0) {
+            coverPath = await uploadFile(coverFile)
+        }
     }
 
     // Generate slug
@@ -109,21 +160,23 @@ export async function createAlbum(prevState: any, formData: FormData) {
                 eventDate: new Date(rawData.eventDate),
                 slug,
                 cover: coverPath,
-                published: rawData.published
+                published: rawData.published,
+                activityType: rawData.activityType,
+                location: rawData.location || null,
             }
         })
         revalidatePath('/admin/gallery')
         redirect(`/admin/gallery/${newAlbum.id}/edit`)
     } catch (error) {
         // NextJS redirect throws an error, so we need to rethrow it if it's a redirect
-        if ((error as any).message === 'NEXT_REDIRECT') throw error
+        if (error instanceof Error && error.message === 'NEXT_REDIRECT') throw error
         console.error(error)
         return { error: 'Gagal membuat album' }
     }
 }
 
 
-export async function uploadGalleryImage(prevState: any, formData: FormData) {
+export async function uploadGalleryImage(prevState: unknown, formData: FormData) {
     const imageFile = formData.get('image') as File
     const title = formData.get('title') as string
     const published = formData.get('status') === 'published'
@@ -148,7 +201,7 @@ export async function uploadGalleryImage(prevState: any, formData: FormData) {
             }
         })
         revalidatePath('/admin/gallery')
-    } catch (error) {
+    } catch {
         return { error: 'Gagal menyimpan data foto' }
     }
 
@@ -183,7 +236,7 @@ export async function uploadAlbumPhotos(albumId: string, formData: FormData) {
                 }
             })
             successCount++
-        } catch (error) {
+        } catch {
             failCount++
         }
     }
@@ -198,21 +251,28 @@ export async function uploadAlbumPhotos(albumId: string, formData: FormData) {
 }
 
 
-export async function updateGalleryAlbum(id: string, prevState: any, formData: FormData) {
+export async function updateGalleryAlbum(id: string, prevState: unknown, formData: FormData) {
     const rawData = {
         title: formData.get('title') as string,
         description: formData.get('description') as string,
         eventDate: formData.get('eventDate') as string,
         published: formData.get('status') === 'published',
+        activityType: formData.get('activityType') as string || 'kegiatan',
+        location: formData.get('location') as string || '',
     }
 
-    const coverFile = formData.get('cover') as File
-    let coverPath = undefined
+    // Cover bisa berupa URL string dari ImageUpload component
+    const coverUrl = formData.get('cover') as string
+    let coverPath: string | undefined = undefined
 
-    if (coverFile && coverFile.size > 0) {
-        const uploadedPath = await uploadFile(coverFile)
-        if (uploadedPath) {
-            coverPath = uploadedPath
+    if (coverUrl && (coverUrl.startsWith('/') || coverUrl.startsWith('http'))) {
+        coverPath = coverUrl
+    } else {
+        // fallback: coba terima raw File
+        const coverFile = formData.get('cover') as File
+        if (coverFile && coverFile.size > 0) {
+            const uploadedPath = await uploadFile(coverFile)
+            if (uploadedPath) coverPath = uploadedPath
         }
     }
 
@@ -224,10 +284,12 @@ export async function updateGalleryAlbum(id: string, prevState: any, formData: F
                 description: rawData.description,
                 eventDate: new Date(rawData.eventDate),
                 published: rawData.published,
+                activityType: rawData.activityType,
+                location: rawData.location || null,
                 ...(coverPath && { cover: coverPath })
             }
         })
-    } catch (error) {
+    } catch {
         return { error: 'Gagal mengupdate album' }
     }
 
@@ -236,7 +298,7 @@ export async function updateGalleryAlbum(id: string, prevState: any, formData: F
     redirect('/admin/gallery')
 }
 
-export async function updateGalleryImage(id: string, prevState: any, formData: FormData) {
+export async function updateGalleryImage(id: string, prevState: unknown, formData: FormData) {
     const title = formData.get('title') as string
     const published = formData.get('status') === 'published'
 
@@ -266,3 +328,4 @@ export async function updateGalleryImage(id: string, prevState: any, formData: F
     revalidatePath('/admin/gallery')
     redirect('/admin/gallery')
 }
+

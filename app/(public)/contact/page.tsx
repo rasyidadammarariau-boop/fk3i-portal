@@ -1,15 +1,22 @@
-import { Mail, MapPin, Phone } from "lucide-react"
 import prisma from "@/lib/prisma"
+import { Metadata } from "next"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { ContactForm } from "@/components/contact-form"
+import { MessageSquare, Phone, Mail, FileText, ArrowRight, MapPin } from "lucide-react"
+import Link from "next/link"
 
-async function getOrganizationProfile() {
+export const metadata: Metadata = {
+    title: 'Pusat Aspirasi & Pengaduan | BEM Pesantren Indonesia',
+    description: 'Sampaikan aspirasi, pengaduan isu, atau usulan kajian kebijakan kepada BEM Pesantren Indonesia.',
+}
+
+async function getProfile() {
     try {
-        return await prisma.organizationProfile.findUnique({
-            where: { id: "default" }
-        })
-    } catch (e) {
-        return null
-    }
+        return await prisma.organizationProfile.findUnique({ where: { id: "default" } })
+    } catch { return null }
 }
 
 async function getMessageCategories() {
@@ -19,97 +26,181 @@ async function getMessageCategories() {
             orderBy: { order: 'asc' },
             select: { id: true, name: true }
         })
-    } catch (e) {
-        return []
-    }
+    } catch { return [] }
 }
 
+const QUICK_CHANNELS = [
+    {
+        title: "Laporkan Isu Kebijakan",
+        desc: "Ada kebijakan kampus atau pemerintah yang merugikan santri? Laporkan ke kami.",
+        action: "Kirim Laporan",
+    },
+    {
+        title: "Usulkan Kajian",
+        desc: "Punya ide topik kajian isu nasional yang relevan? Kami tampung sebagai agenda riset BEM.",
+        action: "Usulkan Sekarang",
+    },
+    {
+        title: "Undang Kolaborasi",
+        desc: "Ingin mengundang BEM Pesantren Indonesia untuk berkolaborasi dalam kegiatan atau aksi?",
+        action: "Buat Undangan",
+    },
+]
+
 export default async function ContactPage() {
-    const profile = await getOrganizationProfile()
+    const profile = await getProfile()
     const categories = await getMessageCategories()
 
+    const waNumber = profile?.whatsapp || "6281234567890"
+    const waLink = `https://wa.me/${waNumber}?text=${encodeURIComponent("Assalamualaikum, saya ingin menyampaikan aspirasi kepada BEM Pesantren Indonesia.")}`
+
     return (
-        <div className="bg-[#fcfcfc] min-h-screen pb-24">
-            {/* Hero Section */}
-            <div className="bg-primary pt-32 pb-20 text-center text-white relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-[pulse_10s_ease-in-out_infinite]"></div>
+        <div className="bg-background min-h-screen pb-24">
+            {/* Hero */}
+            <div className="bg-background border-b border-border pt-24 pb-12 md:pt-32 md:pb-16 text-center relative overflow-hidden">
+                <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
                 <div className="container mx-auto px-6 relative z-10">
-                    <span className="text-secondary font-bold tracking-widest uppercase text-sm mb-4 block">Saluran Aspirasi</span>
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6">Hubungi Kami</h1>
-                    <p className="text-xl opacity-80 max-w-2xl mx-auto font-light">
-                        Kami siap mendengar aspirasi, pertanyaan, atau undangan kegiatan dari Anda.
+                    <Badge variant="outline" className="font-bold tracking-widest uppercase text-xs mb-4 max-w-max mx-auto block">
+                        Saluran Aspirasi Resmi
+                    </Badge>
+                    <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold mb-4">
+                        Pusat Aspirasi <br className="hidden md:block" />& Pengaduan
+                    </h1>
+                    <p className="text-base sm:text-lg max-w-2xl mx-auto text-muted-foreground font-light">
+                        Sampaikan isu kebijakan, usulkan kajian, atau ajak BEM Pesantren Indonesia berkolaborasi dalam pergerakan Anda.
                     </p>
+
+                    {/* WhatsApp CTA */}
+                    <a
+                        href={waLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-8 inline-flex items-center gap-2 bg-foreground text-background font-bold px-6 py-3 rounded-full text-sm transition-opacity hover:opacity-80"
+                    >
+                        <Phone className="w-4 h-4" /> Hubungi via WhatsApp Langsung
+                    </a>
                 </div>
             </div>
 
-            <div className="container mx-auto px-6 -mt-10 relative z-20">
-                <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Contact Info Cards */}
-                    <div className="lg:col-span-1 space-y-6">
-                        {/* Address */}
+            <div className="container mx-auto px-4 md:px-6 mt-10 space-y-12">
+
+                {/* Quick Channels */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {QUICK_CHANNELS.map((ch) => (
+                        <a
+                            key={ch.title}
+                            href="#form-aspirasi"
+                            className="block group"
+                        >
+                            <Card className="border-border h-full hover:border-foreground/30 hover:shadow-md transition-all duration-200">
+                                <CardContent className="p-5 flex flex-col gap-3 h-full">
+                                    <h3 className="font-serif font-bold text-base group-hover:text-primary transition-colors">
+                                        {ch.title}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                                        {ch.desc}
+                                    </p>
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold">
+                                        {ch.action} <ArrowRight className="w-3 h-3" />
+                                    </span>
+                                </CardContent>
+                            </Card>
+                        </a>
+                    ))}
+                </div>
+
+                <Separator />
+
+                {/* Form Aspirasi + Info Panel */}
+                <div id="form-aspirasi" className="grid lg:grid-cols-3 gap-8 items-start">
+
+                    {/* Info Panel */}
+                    <div className="lg:col-span-1 space-y-4">
+                        <h2 className="text-lg font-serif font-bold">Saluran Lainnya</h2>
+
                         {profile?.address && (
-                            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 flex items-start gap-4">
-                                <div className="min-w-12 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <MapPin className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="font-serif font-bold text-xl mb-2 text-primary">Alamat Pusat</h3>
-                                    <p className="text-muted-foreground leading-relaxed">
-                                        {profile.address}<br />
-                                        {profile.city && `${profile.city}, `}{profile.province}<br />
-                                        {profile.postalCode}
-                                    </p>
-                                </div>
-                            </div>
+                            <Card className="border-border">
+                                <CardContent className="p-4 flex items-start gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-sm">Alamat Pusat</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                                            {profile.address}{profile.city && `, ${profile.city}`}{profile.province && `, ${profile.province}`}
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         )}
 
-                        {/* Email */}
                         {profile?.email && (
-                            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 flex items-start gap-4">
-                                <div className="min-w-12 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <Mail className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="font-serif font-bold text-xl mb-2 text-primary">Email Resmi</h3>
-                                    <p className="text-muted-foreground">
-                                        {profile.email}<br />
-                                        {profile.emailSecondary && profile.emailSecondary}
-                                    </p>
-                                </div>
-                            </div>
+                            <Card className="border-border">
+                                <CardContent className="p-4 flex items-start gap-3">
+                                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                        <Mail className="w-4 h-4 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-sm">Email Resmi</p>
+                                        <a
+                                            href={`mailto:${profile.email}`}
+                                            className="text-xs text-muted-foreground hover:text-foreground transition-colors break-all"
+                                        >
+                                            {profile.email}
+                                        </a>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         )}
 
-                        {/* WhatsApp */}
-                        {profile?.whatsapp && (
-                            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 flex items-start gap-4">
-                                <div className="min-w-12 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <Phone className="w-6 h-6" />
+                        <Card className="border-border">
+                            <CardContent className="p-4 flex items-start gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                    <MessageSquare className="w-4 h-4 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <h3 className="font-serif font-bold text-xl mb-2 text-primary">WhatsApp</h3>
-                                    <p className="text-muted-foreground">
-                                        <a href={`https://wa.me/${profile.whatsapp}`} className="hover:text-primary transition-colors">
-                                            +{profile.whatsapp.replace(/^(\d{2})(\d+)/, '$1 $2')} (Admin)
-                                        </a><br />
-                                        {profile.whatsappSecondary && (
-                                            <a href={`https://wa.me/${profile.whatsappSecondary}`} className="hover:text-primary transition-colors">
-                                                +{profile.whatsappSecondary.replace(/^(\d{2})(\d+)/, '$1 $2')} (Humas)
-                                            </a>
-                                        )}
-                                    </p>
+                                    <p className="font-semibold text-sm">WhatsApp</p>
+                                    <a
+                                        href={waLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium"
+                                    >
+                                        Chat langsung →
+                                    </a>
                                 </div>
-                            </div>
-                        )}
+                            </CardContent>
+                        </Card>
+
+                        <Card className="border-border">
+                            <CardContent className="p-4 flex items-start gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                    <FileText className="w-4 h-4 text-muted-foreground" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-sm">Repositori Dokumen</p>
+                                    <p className="text-xs text-muted-foreground mb-2">Unduh AD/ART, GBHO, dan dokumen resmi.</p>
+                                    <Link href="/documents">
+                                        <Button size="sm" variant="outline" className="text-xs h-7">
+                                            Buka Repositori →
+                                        </Button>
+                                    </Link>
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
-                    {/* Contact Form */}
+                    {/* Form Card */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-gray-100">
-                            <h2 className="font-serif font-bold text-3xl mb-2 text-gray-900">Kirim Pesan</h2>
-                            <p className="text-muted-foreground mb-8">Silakan isi formulir di bawah ini untuk mengirimkan pesan langsung kepada kami.</p>
-
-                            <ContactForm categories={categories} />
-                        </div>
+                        <Card className="border-border shadow-sm">
+                            <CardContent className="p-6 sm:p-8">
+                                <h2 className="font-serif font-bold text-2xl mb-1">Kirim Aspirasi</h2>
+                                <p className="text-sm text-muted-foreground mb-6">
+                                    Sampaikan isu, pengaduan, atau usulan secara tertulis. Tim kami akan menindaklanjuti setiap pesan yang masuk.
+                                </p>
+                                <ContactForm categories={categories} />
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </div>

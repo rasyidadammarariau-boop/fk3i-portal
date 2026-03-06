@@ -6,7 +6,7 @@ async function getOrganizationProfile() {
         return await prisma.organizationProfile.findUnique({
             where: { id: "default" }
         })
-    } catch (e) {
+    } catch {
         return null
     }
 }
@@ -17,11 +17,12 @@ export default async function OrganizationPage() {
     return (
         <div className="p-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Profil Organisasi</h1>
-                <p className="text-muted-foreground">Kelola informasi kontak dan profil organisasi</p>
+                <h1 className="text-3xl font-serif font-bold  mb-2">Profil Organisasi</h1>
+                <p className="">Kelola informasi kontak dan profil organisasi</p>
             </div>
 
             <OrganizationProfileForm profile={profile} />
         </div>
     )
 }
+

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowLeft, Calendar, Image as ImageIcon, Trash2, UploadCloud, Plus } from "lucide-react"
+import { ArrowLeft, Calendar, Trash2, UploadCloud, Plus, Link as LinkIcon } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useRef } from "react"
@@ -11,7 +11,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
 interface AlbumDetailViewProps {
-    album: any
+    album: { id: string, title: string, eventDate: Date, description: string | null, images: Array<{ id: string, url: string, title: string | null }> }
 }
 
 export function AlbumDetailView({ album }: AlbumDetailViewProps) {
@@ -66,7 +66,7 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
             } else {
                 toast.error(result.error)
             }
-        } catch (error) {
+        } catch {
             toast.error("Terjadi kesalahan saat upload")
         } finally {
             setIsUploading(false)
@@ -81,7 +81,7 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
             await deleteGalleryImage(photoId)
             toast.success("Foto dihapus")
             router.refresh()
-        } catch (error) {
+        } catch {
             toast.error("Gagal menghapus foto")
         }
     }
@@ -90,14 +90,14 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
         <div className="space-y-8">
             {/* Header */}
             <div className="flex flex-col gap-4">
-                <Link href="/admin/gallery" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+                <Link href="/admin/gallery" className="inline-flex items-center text-sm  hover:">
                     <ArrowLeft className="w-4 h-4 mr-2" /> Kembali ke Galeri
                 </Link>
 
                 <div className="flex flex-col md:flex-row justify-between gap-4 md:items-start">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{album.title}</h1>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                        <h1 className="text-3xl font-bold  dark:text-gray-100">{album.title}</h1>
+                        <div className="flex items-center gap-4 mt-2 text-sm ">
                             <span className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
                                 {new Date(album.eventDate).toLocaleDateString('id-ID', { dateStyle: 'long' })}
@@ -114,7 +114,7 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
 
             {/* Upload Zone */}
             <Card
-                className={`border-2 border-dashed transition-colors ${dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-200 dark:border-gray-800"
+                className={`border-2 border-dashed transition-colors ${dragActive ? "border-primary bg-muted/50" : "border-border"
                     }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -136,7 +136,7 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
                     </div>
 
                     <h3 className="text-lg font-medium mb-1">Upload Foto ke Album Ini</h3>
-                    <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+                    <p className="text-sm  mb-6 max-w-sm">
                         Drag & drop foto di sini, atau klik tombol di bawah untuk memilih banyak foto sekaligus.
                     </p>
 
@@ -155,7 +155,7 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
 
             {/* Photos Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {album.images.map((img: any) => (
+                {album.images.map(img => (
                     <div key={img.id} className="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden border">
                         <Image
                             src={img.url}
@@ -163,12 +163,29 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
                             fill
                             className="object-cover transition-transform group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    navigator.clipboard.writeText(window.location.origin + img.url)
+                                    toast.success("Link gambar disalin!")
+                                }}
+                                title="Copy Link Gambar"
+                            >
+                                <LinkIcon className="w-4 h-4 text-black" />
+                            </Button>
                             <Button
                                 variant="destructive"
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() => handleDeletePhoto(img.id)}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    handleDeletePhoto(img.id)
+                                }}
+                                title="Hapus Gambar"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </Button>
@@ -178,10 +195,11 @@ export function AlbumDetailView({ album }: AlbumDetailViewProps) {
             </div>
 
             {album.images.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground bg-gray-50 rounded-lg">
+                <div className="text-center py-12  bg-gray-50 rounded-lg">
                     Belum ada foto di album ini.
                 </div>
             )}
         </div>
     )
 }
+

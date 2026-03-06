@@ -1,0 +1,52 @@
+﻿
+> fk3i@0.1.0 lint
+> eslint
+
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\gallery\page.tsx
+   3:10   warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  78:173  warning  'index' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\news\[year]\[month]\[slug]\page.tsx
+  62:19  warning  'month' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\gallery\new-image\page.tsx
+  69:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\app\admin\gallery\new\page.tsx
+  116:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\app\admin\news\actions.ts
+  10:7  warning  '_newsSchema' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\page.tsx
+  178:48  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\search\page.tsx
+  125:37  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\pacong2\Videos\fk3i\components\admin\agenda-form.tsx
+  155:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\admin\edit-album-form.tsx
+  48:12  warning  'imagePreview' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  48:26  warning  'setImagePreview' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\gallery-grid.tsx
+  89:11  warning  'toggleSelectAllAlbums' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\gallery-table.tsx
+  27:5  warning  'startIndex' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\image-upload.tsx
+  77:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\admin\news-form.tsx
+   50:26  warning  'setImagePreview' is assigned a value but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  225:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\ui\combobox.tsx
+  277:3  warning  'children' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 17 problems (0 errors, 17 warnings)
+

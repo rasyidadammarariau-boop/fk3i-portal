@@ -1,13 +1,17 @@
-import Link from "next/link"
+﻿import Link from "next/link"
+import Image from "next/image"
 import { Facebook, Twitter, Instagram, Youtube, MapPin, Mail, Phone } from "lucide-react"
 import prisma from "@/lib/prisma"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 
 async function getOrganizationProfile() {
     try {
         return await prisma.organizationProfile.findUnique({
             where: { id: "default" }
         })
-    } catch (e) {
+    } catch {
         return null
     }
 }
@@ -15,116 +19,170 @@ async function getOrganizationProfile() {
 export default async function Footer() {
     const profile = await getOrganizationProfile()
 
+    const socials = [
+        { href: profile?.facebook, icon: Facebook, label: "Facebook" },
+        { href: profile?.twitter, icon: Twitter, label: "Twitter" },
+        { href: profile?.instagram, icon: Instagram, label: "Instagram" },
+        { href: profile?.youtube, icon: Youtube, label: "YouTube" },
+    ].filter(s => Boolean(s.href))
+
     return (
-        <footer className="bg-primary text-white pt-20 pb-10 mt-auto relative overflow-hidden">
-            <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] animate-[pulse_10s_ease-in-out_infinite]"></div>
+        <footer className="bg-background border-t border-border mt-auto">
+            <div className="container mx-auto px-4 md:px-6 py-10 md:py-16 lg:py-20">
 
-            <div className="container mx-auto px-6 relative z-10">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    {/* Brand Section */}
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary font-bold text-xl">
-                                F
+                {/* Grid utama — 1 col mobile, 2 col tablet, 4 col desktop */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 lg:gap-12">
+
+                    {/* ── Brand Section ── */}
+                    <div className="md:col-span-2 lg:col-span-1 space-y-4 md:space-y-5">
+                        {/* Logo + nama */}
+                        <Link href="/" className="flex items-center gap-3 group w-fit">
+                            <Image
+                                src="/logo.svg"
+                                alt="Logo BEM Pesantren Indonesia"
+                                width={40}
+                                height={40}
+                                className="rounded-xl flex-shrink-0 transition-opacity group-hover:opacity-80 md:w-12 md:h-12"
+                            />
+                            <div className="leading-tight">
+                                <p className="font-serif font-bold text-sm md:text-base leading-tight group-hover:opacity-80 transition-opacity">
+                                    BEM Pesantren Indonesia
+                                </p>
+                                <p className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest font-semibold mt-0.5">
+                                    Mahasiswa Santri Indonesia
+                                </p>
                             </div>
-                            <div>
-                                <h3 className="font-serif font-bold text-xl leading-none">FK3i</h3>
-                                <p className="text-secondary text-xs uppercase tracking-widest font-bold">Forum Kyai Kampung</p>
-                            </div>
-                        </div>
-                        <p className="text-white/70 leading-relaxed font-light">
-                            {profile?.shortDescription || "Wadah silaturahmi dan pergerakan kyai kampung dalam menjaga nilai-nilai keislaman, kebangsaan, dan pemberdayaan umat berbasis kearifan lokal."}
+                        </Link>
+
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                            {profile?.shortDescription ||
+                                "Organisasi mahasiswa santri Indonesia yang bergerak dalam penguatan keagamaan, keilmuan, dan pemberdayaan mahasiswa pesantren di seluruh nusantara."}
                         </p>
-                        <div className="flex gap-4">
-                            {profile?.facebook && (
-                                <Link href={profile.facebook} target="_blank" aria-label="Kunjungi Facebook Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
-                                    <Facebook className="w-5 h-5" />
-                                </Link>
-                            )}
-                            {profile?.twitter && (
-                                <Link href={profile.twitter} target="_blank" aria-label="Kunjungi Twitter Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
-                                    <Twitter className="w-5 h-5" />
-                                </Link>
-                            )}
-                            {profile?.instagram && (
-                                <Link href={profile.instagram} target="_blank" aria-label="Kunjungi Instagram Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
-                                    <Instagram className="w-5 h-5" />
-                                </Link>
-                            )}
-                            {profile?.youtube && (
-                                <Link href={profile.youtube} target="_blank" aria-label="Kunjungi YouTube Kami" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary hover:text-primary transition-all">
-                                    <Youtube className="w-5 h-5" />
-                                </Link>
-                            )}
+
+                        {/* Social links */}
+                        {socials.length > 0 && (
+                            <div className="flex flex-wrap gap-3 pt-1">
+                                {socials.map(({ href, icon: Icon, label }) => (
+                                    <Link
+                                        key={label}
+                                        href={href!}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label={`Kunjungi ${label} Kami`}
+                                        className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── Grouping Navigasi & Hubungi Kami (kanan-kiri di mobile) ── */}
+                    <div className="grid grid-cols-2 gap-4 md:col-span-2 lg:col-span-2 md:gap-8 lg:gap-12">
+                        {/* ── Navigasi Utama ── */}
+                        <div>
+                            <h4 className="font-serif font-bold text-base mb-5">Navigasi Utama</h4>
+                            <ul className="space-y-3 text-sm text-muted-foreground">
+                                {[
+                                    { label: "Beranda", href: "/" },
+                                    { label: "Tentang Kami", href: "/about" },
+                                    { label: "Warta & Berita", href: "/news" },
+                                    { label: "Galeri Foto", href: "/gallery" },
+                                    { label: "Hubungi Kami", href: "/contact" },
+                                ].map(({ label, href }) => (
+                                    <li key={href}>
+                                        <Link
+                                            href={href}
+                                            className="hover:text-primary hover:translate-x-1 transition-all inline-flex items-center gap-1"
+                                        >
+                                            <span className="w-1 h-1 rounded-full bg-primary/50 mr-1" />
+                                            {label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* ── Hubungi Kami ── */}
+                        <div>
+                            <h4 className="font-serif font-bold text-base mb-5">Hubungi Kami</h4>
+                            <ul className="space-y-4 text-sm text-muted-foreground">
+                                {profile?.address && (
+                                    <li className="flex gap-3 items-start">
+                                        <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                                        <span className="leading-relaxed">
+                                            {profile.address}
+                                            {profile.city && `, ${profile.city}`}
+                                            {profile.province && `, ${profile.province}`}
+                                            {profile.postalCode && ` ${profile.postalCode}`}
+                                        </span>
+                                    </li>
+                                )}
+                                {profile?.email && (
+                                    <li className="flex gap-3 items-center">
+                                        <Mail className="w-4 h-4 text-primary shrink-0" />
+                                        <a href={`mailto:${profile.email}`} className="hover:text-primary transition-colors break-all">
+                                            {profile.email}
+                                        </a>
+                                    </li>
+                                )}
+                                {profile?.whatsapp && (
+                                    <li className="flex gap-3 items-center">
+                                        <Phone className="w-4 h-4 text-primary shrink-0" />
+                                        <a
+                                            href={`https://wa.me/${profile.whatsapp}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-primary transition-colors"
+                                        >
+                                            +{profile.whatsapp.replace(/^(\d{2})(\d+)/, "$1 $2")}
+                                        </a>
+                                    </li>
+                                )}
+                                {!profile?.address && !profile?.email && !profile?.whatsapp && (
+                                    <li className="text-muted-foreground/50 italic text-xs">Belum diatur</li>
+                                )}
+                            </ul>
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="font-serif font-bold text-lg mb-6 text-secondary">Navigasi Utama</h4>
-                        <ul className="space-y-4">
-                            <li><Link href="/" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">Beranda</Link></li>
-                            <li><Link href="/about" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">Tentang Kami</Link></li>
-                            <li><Link href="/agenda" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">Agenda Kegiatan</Link></li>
-                            <li><Link href="/news" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">Warta & Berita</Link></li>
-                            <li><Link href="/gallery" className="text-white/70 hover:text-white hover:translate-x-1 transition-all inline-block">Galeri Foto</Link></li>
-                        </ul>
-                    </div>
-
-                    {/* Contact Info */}
-                    <div>
-                        <h4 className="font-serif font-bold text-lg mb-6 text-secondary">Hubungi Kami</h4>
-                        <ul className="space-y-6">
-                            {profile?.address && (
-                                <li className="flex gap-4 items-start">
-                                    <MapPin className="w-6 h-6 text-secondary shrink-0" />
-                                    <span className="text-white/70 text-sm leading-relaxed">
-                                        {profile.address}, {profile.city}, {profile.province} {profile.postalCode}
-                                    </span>
-                                </li>
-                            )}
-                            {profile?.email && (
-                                <li className="flex gap-4 items-start">
-                                    <Mail className="w-5 h-5 text-secondary shrink-0" />
-                                    <span className="text-white/70 text-sm">{profile.email}</span>
-                                </li>
-                            )}
-                            {profile?.whatsapp && (
-                                <li className="flex gap-4 items-start">
-                                    <Phone className="w-5 h-5 text-secondary shrink-0" />
-                                    <a href={`https://wa.me/${profile.whatsapp}`} className="text-white/70 text-sm hover:text-white transition-colors">
-                                        +{profile.whatsapp.replace(/^(\d{2})(\d+)/, '$1 $2')}
-                                    </a>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-
-                    {/* Newsletter / Highlight */}
-                    <div>
-                        <h4 className="font-serif font-bold text-lg mb-6 text-secondary">Bergabung Bersama Kami</h4>
-                        <p className="text-white/70 mb-6 text-sm">
-                            Dapatkan informasi terkini mengenai kegiatan dan dakwah FK3i langsung ke email Anda.
+                    {/* ── Newsletter ── */}
+                    <div className="md:col-span-2 lg:col-span-1">
+                        <h4 className="font-serif font-bold text-base mb-5">Bergabung Bersama Kami</h4>
+                        <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                            Dapatkan informasi terkini kegiatan BEM Pesantren Indonesia langsung ke email Anda.
                         </p>
                         <div className="flex gap-2">
-                            <input type="email" placeholder="Email Anda" className="bg-white/10 border-none rounded-lg px-4 py-2 text-white placeholder:text-white/30 w-full focus:ring-1 focus:ring-secondary outline-none" />
-                            <button aria-label="Subscribe Newsletter" className="bg-secondary text-primary font-bold px-4 py-2 rounded-lg hover:bg-white transition-colors">
+                            <Input
+                                type="email"
+                                placeholder="Email Anda..."
+                                className="text-sm flex-1 min-w-0"
+                            />
+                            <Button
+                                aria-label="Daftar Newsletter"
+                                size="sm"
+                                className="shrink-0 px-4 font-bold md:h-9"
+                            >
                                 OK
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <p className="text-white/40 text-sm text-center md:text-left">
-                        &copy; {new Date().getFullYear()} FK3i. All rights reserved.
+                <Separator className="my-8 md:my-10" />
+
+                {/* ── Bottom Bar ── */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-muted-foreground">
+                    <p className="text-center md:text-left">
+                        &copy; {new Date().getFullYear()} BEM Pesantren Indonesia. All rights reserved.
                     </p>
-                    <div className="flex gap-6 text-sm text-white/40">
-                        <Link href="#" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
-                        <Link href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</Link>
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-6">
+                        <Link href="/privacy-policy" className="hover:text-primary transition-colors">Kebijakan Privasi</Link>
+                        <Link href="/terms-of-service" className="hover:text-primary transition-colors">Syarat &amp; Ketentuan</Link>
                     </div>
                 </div>
+
             </div>
         </footer>
     )

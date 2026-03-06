@@ -1,0 +1,213 @@
+﻿
+> fk3i@0.1.0 lint
+> eslint
+
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\about\page.tsx
+  13:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\contact\page.tsx
+  12:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  24:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\gallery\[slug]\page.tsx
+  18:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\gallery\page.tsx
+   3:10   warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  53:14   warning  'e' is defined but never used       @typescript-eslint/no-unused-vars
+  78:173  warning  'index' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\gallery\photo\[id]\page.tsx
+  17:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\layout.tsx
+  13:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\news\[year]\[month]\[slug]\page.tsx
+  16:14  warning  'e' is defined but never used               @typescript-eslint/no-unused-vars
+  35:14  warning  'e' is defined but never used               @typescript-eslint/no-unused-vars
+  62:19  warning  'month' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\news\[year]\page.tsx
+  5:10  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+  5:20  warning  'Search' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\(public)\news\page.tsx
+  37:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\gallery\actions.ts
+   14:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+   26:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+   42:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+   58:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  151:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  186:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  230:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\gallery\new-image\page.tsx
+  69:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\app\admin\gallery\new\page.tsx
+  116:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\app\admin\message-categories\page.tsx
+   3:10  warning  'Badge' is defined but never used  @typescript-eslint/no-unused-vars
+  19:14  warning  'e' is defined but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\messages\page.tsx
+   4:16  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+  14:14  warning  'e' is defined but never used         @typescript-eslint/no-unused-vars
+  27:14  warning  'e' is defined but never used         @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\news\actions.ts
+  10:7  warning  'newsSchema' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\news\page.tsx
+   8:10  warning  'Select' is defined but never used         @typescript-eslint/no-unused-vars
+   8:18  warning  'SelectContent' is defined but never used  @typescript-eslint/no-unused-vars
+   8:33  warning  'SelectItem' is defined but never used     @typescript-eslint/no-unused-vars
+   8:45  warning  'SelectTrigger' is defined but never used  @typescript-eslint/no-unused-vars
+   8:60  warning  'SelectValue' is defined but never used    @typescript-eslint/no-unused-vars
+  42:14  warning  'e' is defined but never used              @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\organization\page.tsx
+  9:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\page.tsx
+    7:57  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+  178:48  warning  'index' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\admin\search\page.tsx
+    3:20  warning  'Calendar' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  125:37  warning  Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images  jsx-a11y/alt-text
+
+C:\Users\pacong2\Videos\fk3i\app\admin\settings\actions.ts
+  177:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\layout.tsx
+  2:10  warning  'Geist' is defined but never used       @typescript-eslint/no-unused-vars
+  2:17  warning  'Geist_Mono' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\app\not-found.tsx
+  2:16  warning  'Search' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\Footer.tsx
+   2:70  warning  'ArrowLeft' is defined but never used   @typescript-eslint/no-unused-vars
+   2:81  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  12:14  warning  'e' is defined but never used           @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\agenda-form.tsx
+   15:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   15:61  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   34:26  warning  'setImagePreview' is assigned a value but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  149:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\admin\album-detail-view.tsx
+   5:40  warning  'ImageIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  69:18  warning  'error' is defined but never used      @typescript-eslint/no-unused-vars
+  84:18  warning  'error' is defined but never used      @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\categories-table.tsx
+  21:5  warning  'DialogTrigger' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\dashboard-skeletons.tsx
+  1:41  warning  'CardTitle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\edit-album-form.tsx
+    8:44  warning  'ImageIcon' is defined but never used                 @typescript-eslint/no-unused-vars
+   48:12  warning  'imagePreview' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   48:26  warning  'setImagePreview' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   70:18  warning  'error' is defined but never used                     @typescript-eslint/no-unused-vars
+   84:18  warning  'error' is defined but never used                     @typescript-eslint/no-unused-vars
+  122:18  warning  'error' is defined but never used                     @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\edit-image-form.tsx
+  25:11  warning  'router' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\gallery-grid.tsx
+   3:29  warning  'CardFooter' is defined but never used                      @typescript-eslint/no-unused-vars
+   4:10  warning  'Badge' is defined but never used                           @typescript-eslint/no-unused-vars
+  50:18  warning  'error' is defined but never used                           @typescript-eslint/no-unused-vars
+  62:18  warning  'error' is defined but never used                           @typescript-eslint/no-unused-vars
+  90:11  warning  'toggleSelectAllAlbums' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\gallery-table.tsx
+    6:26  warning  'ImageIcon' is defined but never used   @typescript-eslint/no-unused-vars
+   27:5   warning  'startIndex' is defined but never used  @typescript-eslint/no-unused-vars
+   96:18  warning  'error' is defined but never used       @typescript-eslint/no-unused-vars
+  109:18  warning  'error' is defined but never used       @typescript-eslint/no-unused-vars
+  123:18  warning  'error' is defined but never used       @typescript-eslint/no-unused-vars
+  138:18  warning  'error' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\header.tsx
+   5:10  warning  'Bell' is defined but never used   @typescript-eslint/no-unused-vars
+  35:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\image-upload.tsx
+   4:8   warning  'Image' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   5:10  warning  'Input' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  79:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\admin\layout-skeleton.tsx
+  2:10  warning  'Card' is defined but never used         @typescript-eslint/no-unused-vars
+  2:16  warning  'CardContent' is defined but never used  @typescript-eslint/no-unused-vars
+  2:29  warning  'CardHeader' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\minimal-editor.tsx
+  19:5  warning  'Undo' is defined but never used  @typescript-eslint/no-unused-vars
+  20:5  warning  'Redo' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\news-form.tsx
+    9:10  warning  'ArrowLeft' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   17:5   warning  'Dialog' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   18:5   warning  'DialogContent' is defined but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   19:5   warning  'DialogHeader' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   20:5   warning  'DialogTitle' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   56:26  warning  'setImagePreview' is assigned a value but never used                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  231:45  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\pacong2\Videos\fk3i\components\admin\news-table.tsx
+  6:26  warning  'MoreHorizontal' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\notification-menu.tsx
+  4:23  warning  'Trash2' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\admin\pie-chart.tsx
+   4:32  warning  'Sector' is defined but never used             @typescript-eslint/no-unused-vars
+   5:15  warning  'PieSectorDataItem' is defined but never used  @typescript-eslint/no-unused-vars
+  22:5   warning  'Select' is defined but never used             @typescript-eslint/no-unused-vars
+  23:5   warning  'SelectContent' is defined but never used      @typescript-eslint/no-unused-vars
+  24:5   warning  'SelectItem' is defined but never used         @typescript-eslint/no-unused-vars
+  25:5   warning  'SelectTrigger' is defined but never used      @typescript-eslint/no-unused-vars
+  26:5   warning  'SelectValue' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\app-sidebar.tsx
+  13:3   warning  'SidebarFooter' is defined but never used      @typescript-eslint/no-unused-vars
+  23:17  warning  'session' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  24:9   warning  'pathname' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\home\gallery-section.tsx
+  42:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\home\news-section.tsx
+  14:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\home\stats-section.tsx
+  14:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\login-form.tsx
+  52:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\nav-user.tsx
+   4:3  warning  'BadgeCheck' is defined but never used         @typescript-eslint/no-unused-vars
+   5:3  warning  'Bell' is defined but never used               @typescript-eslint/no-unused-vars
+   7:3  warning  'CreditCard' is defined but never used         @typescript-eslint/no-unused-vars
+   9:3  warning  'Sparkles' is defined but never used           @typescript-eslint/no-unused-vars
+  20:3  warning  'DropdownMenuGroup' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\pacong2\Videos\fk3i\components\ui\combobox.tsx
+  277:3  warning  'children' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 114 problems (2 errors, 112 warnings)
+

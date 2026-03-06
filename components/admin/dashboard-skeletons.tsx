@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function StatsSkeleton() {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-                <Card key={i} className="dark:border-gray-700 dark:bg-gray-800">
+                <Card key={i}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <Skeleton className="h-4 w-[100px]" />
                         <Skeleton className="h-8 w-8 rounded-full" />
@@ -24,7 +24,7 @@ export function ChartsSkeleton() {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <div className="col-span-4">
-                <Card className="dark:border-gray-700 dark:bg-gray-800">
+                <Card>
                     <CardHeader>
                         <Skeleton className="h-6 w-[200px] mb-2" />
                         <Skeleton className="h-4 w-[300px]" />
@@ -35,7 +35,7 @@ export function ChartsSkeleton() {
                 </Card>
             </div>
             <div className="col-span-3">
-                <Card className="dark:border-gray-700 dark:bg-gray-800">
+                <Card>
                     <CardHeader>
                         <Skeleton className="h-6 w-[150px] mb-2" />
                         <Skeleton className="h-4 w-[200px]" />
@@ -51,7 +51,7 @@ export function ChartsSkeleton() {
 
 export function ActivitySkeleton() {
     return (
-        <Card className="col-span-1 md:col-span-3 dark:border-gray-700 dark:bg-gray-800">
+        <Card className="col-span-1 md:col-span-3">
             <CardHeader>
                 <Skeleton className="h-6 w-[180px]" />
             </CardHeader>
@@ -73,3 +73,4 @@ export function ActivitySkeleton() {
         </Card>
     )
 }
+

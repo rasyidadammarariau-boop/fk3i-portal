@@ -26,7 +26,7 @@ export default async function AdminGalleryPage({ searchParams }: { searchParams:
     const years = Array.from(new Set(allAlbums.map(album => new Date(album.eventDate).getFullYear())))
 
     // Construct Where Clause
-    const albumWhere: any = {
+    const albumWhere: import('@prisma/client').Prisma.GalleryAlbumWhereInput = {
         title: { contains: query },
         ...(yearFilter && {
             eventDate: {
@@ -41,7 +41,7 @@ export default async function AdminGalleryPage({ searchParams }: { searchParams:
     // If year filter is active, maybe we hide standalone images or filter them by createdAt?
     // Let's filter standalone images by createdAt too if year is selected.
 
-    const imageWhere: any = {
+    const imageWhere: import('@prisma/client').Prisma.GalleryImageWhereInput = {
         albumId: null,
         title: { contains: query },
         ...(yearFilter && {
@@ -76,8 +76,8 @@ export default async function AdminGalleryPage({ searchParams }: { searchParams:
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">Galeri</h1>
-                    <p className="text-muted-foreground">Kelola album foto dan dokumentasi kegiatan.</p>
+                    <h1 className="text-3xl font-bold tracking-tight  dark:text-gray-100">Galeri</h1>
+                    <p className="">Kelola album foto dan dokumentasi kegiatan.</p>
                 </div>
                 <div className="flex gap-2">
                     <Link href="/admin/gallery/new-image">
@@ -107,3 +107,4 @@ export default async function AdminGalleryPage({ searchParams }: { searchParams:
         </div>
     )
 }
+

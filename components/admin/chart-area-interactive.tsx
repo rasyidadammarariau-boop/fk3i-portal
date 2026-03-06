@@ -48,7 +48,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig
 
-export function ChartAreaInteractive({ data }: { data: any[] }) {
+export function ChartAreaInteractive({ data }: { data: Array<{ date: string; berita: number; agenda?: number; galeri: number }> }) {
     const [timeRange, setTimeRange] = React.useState("90d")
 
     const filteredData = data.filter((item) => {
@@ -66,22 +66,22 @@ export function ChartAreaInteractive({ data }: { data: any[] }) {
     })
 
     return (
-        <Card className="pt-0 dark:border-gray-700 dark:bg-gray-800">
-            <CardHeader className="flex items-center gap-2 space-y-0 border-b dark:border-gray-700 py-5 sm:flex-row">
+        <Card className="pt-0">
+            <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
                 <div className="grid flex-1 gap-1">
-                    <CardTitle className="dark:text-white">Statistik Konten</CardTitle>
-                    <CardDescription className="dark:text-gray-400">
+                    <CardTitle>Statistik Konten</CardTitle>
+                    <CardDescription>
                         Menampilkan trend upload konten
                     </CardDescription>
                 </div>
                 <Select value={timeRange} onValueChange={setTimeRange}>
                     <SelectTrigger
-                        className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex dark:bg-gray-900 dark:text-white dark:border-gray-600"
+                        className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
                         aria-label="Select a value"
                     >
                         <SelectValue placeholder="3 Bulan Terakhir" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl dark:bg-gray-900 dark:border-gray-600 dark:text-white">
+                    <SelectContent className="rounded-xl">
                         <SelectItem value="90d" className="rounded-lg">
                             3 Bulan Terakhir
                         </SelectItem>
@@ -171,3 +171,4 @@ export function ChartAreaInteractive({ data }: { data: any[] }) {
         </Card>
     )
 }
+

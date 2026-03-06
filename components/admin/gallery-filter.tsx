@@ -43,3 +43,4 @@ export function GalleryFilter({ years }: { years: number[] }) {
         </Select>
     )
 }
+

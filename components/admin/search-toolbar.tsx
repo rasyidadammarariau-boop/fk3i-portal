@@ -46,9 +46,9 @@ export function SearchToolbar({
     }
 
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border dark:border-gray-700 shadow-sm mb-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 bg-background p-4 rounded-lg border shadow-sm mb-6">
             <div className="relative flex-1 w-full sm:max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 " />
                 <Input
                     placeholder={placeholder}
                     className="pl-9 w-full bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600 focus:bg-white dark:focus:bg-gray-800 transition-colors"
@@ -61,7 +61,7 @@ export function SearchToolbar({
                 {children}
 
                 {isFiltered && (
-                    <Button variant="ghost" onClick={clearFilters} className="h-8 px-2 lg:px-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <Button variant="ghost" onClick={clearFilters} className="h-8 px-2 lg:px-3 text-destructive hover:text-destructive hover:bg-destructive/10">
                         Reset
                         <X className="ml-2 h-4 w-4" />
                     </Button>
@@ -70,3 +70,4 @@ export function SearchToolbar({
         </div>
     )
 }
+
